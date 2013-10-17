@@ -1,0 +1,736 @@
+#include <reg52.h>
+#include <string.h>
+#include "lcd12864.h"
+
+void delayus(unsigned int t)
+{
+	while(--t);
+
+}
+
+void lcd_write_command(unsigned char command){
+	EN=0;
+	RS=0;
+	RW=0;
+	delayus(1);
+	P0=command;
+	EN=1;
+	delayus(10); 
+	EN=0;
+	delayus(1);
+}
+
+void lcd_write_data(unsigned char RWdata){
+	EN=0;
+	RS=1;
+	RW=0;
+	delayus(1);
+	P0=RWdata;
+	EN=1;
+	delayus(10);
+	EN=0;
+	delayus(1);
+}
+
+unsigned char lcd_read_data(void){
+	unsigned char Tempdata;
+	P0=0xFF;
+	EN=0;
+	RS=1;
+	RW=1;
+	delayus(1);
+	EN=1;
+	delayus(10);
+	Tempdata=P0;
+	EN=0;
+	return Tempdata;
+}
+
+void lcd_init(void){
+	lcd_write_command(LCDb_BASCMD);//功能设置，一次送8位数据，基本指令集
+	lcd_write_command(LCDb_ON);//整体显示，游标off，游标位置off
+	lcd_write_command(LCDb_CLS);//清DDRAM   清屏
+	lcd_write_command(LCDb_HOME);//DDRAM地址归位
+	//lcd_write_command(0x80);//设定DDRAM 7位地址000，0000到地址计数器AC//     
+	lcd_write_command(CurserRight);//点设定，显示字符/光标从左到右移位，DDRAM地址加 一//   
+	//lcd_write_command(0x0C);//显示设定，开显示，显示光标，当前显示位反白闪动
+	lcd_write_command(LCDb_CLS);//清屏	   */
+}
+
+void first_page(void){
+	unsigned char i,j;
+	lcd_write_command(LCDb_EXTCMD2);
+	for(i=0;i<16;i++){
+		for(j=0;j<32;j++){
+			lcd_write_command(0x80|j);
+			lcd_write_command(i|0x80);
+			lcd_write_data(0x00);
+			lcd_write_data(0x00);	
+		}
+	}
+	lcd_write_command(LCDb_BASCMD);
+}
+
+
+void display_string(unsigned char line,unsigned char space,unsigned char *string){
+	unsigned char  addr,i;
+	unsigned char  maxnum=strlen(string);
+    if(line==1)
+      addr=0x80;
+    else if(line==2)
+      addr=0x90;
+    else if(line==3)
+      addr=0x88;
+    else if(line==4)
+		addr=0x98;
+	addr+=space;
+    lcd_write_command(addr);
+    for(i=0;i<maxnum;i++)
+    {
+		lcd_write_data(*string++);
+	} 
+}
+
+void set_dot(unsigned char x,unsigned char y){
+	if(x>=0 && x<=127 && y>=0 && y<=63){
+	//initial variables
+	unsigned int k=0x8000;
+	unsigned char highdata,lowdata;
+	//Open external command and graphic display
+	lcd_write_command(LCDb_EXTCMD2);
+	//According to y, adjust x and y
+	if(y>=32){
+		y=y-32;
+		x=x+128;
+	}
+	//according to x, get which bit will be setted.
+	k=k>>x%16;
+	//write x and y to prepare to read data
+	lcd_write_command(0x80|y);
+	lcd_write_command((x/16)|0x80);
+	//read exist data and change them to new data.
+	highdata=lcd_read_data();
+	highdata=lcd_read_data()|k>>8;
+	lowdata=lcd_read_data()|k;
+	//write x and y	to prepare to write data
+	lcd_write_command(0x80|y);
+	lcd_write_command((x/16)|0x80);
+	//write data
+	lcd_write_data(highdata);
+	lcd_write_data(lowdata);
+	//display
+	//lcd_write_command(LCDb_EXTCMD2);
+	//go back to basic command
+	lcd_write_command(LCDb_BASCMD);
+	}
+}
+
+void clear_dot(unsigned char x,unsigned char y){
+	if(x>=0 && x<=127 && y>=0 && y<=63){
+	//initial variables
+	unsigned int k=0x7FFF;
+	unsigned char highdata,lowdata;
+	//Open external command and graphic display
+	lcd_write_command(LCDb_EXTCMD2);
+	//According to y, adjust x and y
+	if(y>=32){
+		y=y-32;
+		x=x+128;
+	}
+	//according to x, get which bit will be setted.
+	k=k>>x%16;
+	//write x and y to prepare to read data
+	lcd_write_command(0x80|y);
+	lcd_write_command((x/16)|0x80);
+	//read exist data and change them to new data.
+	highdata=lcd_read_data();
+	highdata=lcd_read_data()&k>>8;
+	lowdata=lcd_read_data()&k;
+	//write x and y	to prepare to write data
+	lcd_write_command(0x80|y);
+	lcd_write_command((x/16)|0x80);
+	//write data
+	lcd_write_data(highdata);
+	lcd_write_data(lowdata);
+	//display
+	//lcd_write_command(LCDb_EXTCMD2);
+	//go back to basic command
+	lcd_write_command(LCDb_BASCMD);
+	}
+}
+
+void draw_line(unsigned char x1,unsigned char y1,unsigned char x2,unsigned char y2){	
+	char dx,dy;//Difference between x1 and x2 and difference between y1 and y2
+	unsigned char x,y,temp;//x,y: location of pixel.  temp: temp value for exchange of x and y
+	int e;//adjust whether should be increased
+	bit k,j;//k: upper slope flag.  j: negative slope flag
+	dx=x2-x1;
+	dy=y2-y1;
+	//if the line is not from high to low, change it.
+	if((dx<=0 && dy<=0) || (dx>=0 && dy<=0)){
+		temp=x2;
+		x2=x1;
+		x1=temp;
+		temp=y2;
+		y2=y1;
+		y1=temp;
+		dx=x2-x1;
+		dy=y2-y1;
+	}
+	//if negative slope, change to positive and get flag
+	if(dx<0){
+		temp=x2;
+		x2=x1;
+		x1=temp;
+		dx=x2-x1;
+		j=1;
+	}else{
+		j=0;
+	}
+	//if upper slope, get flag
+	if(dx>=dy){
+		k=1;	
+	}else{
+		k=0;
+	}
+	//Different slope, different default e
+	if(k){
+		e=-dx;
+	}else{
+		e=-dy;
+	}
+	//first point
+	x=x1;
+	y=y1;
+	//if has been finished final point, finish drawing.
+	while(x<=x2 && y<=y2){
+		//if the original slope is negative slope, should  change points back
+		if(j){
+			set_dot(x1+x2-x,y);
+		}else{
+			set_dot(x,y);
+		}
+		//different slope, different change of e
+		if(k){
+			e=e+2*dy;
+		}else{
+			e=e+2*dx;
+		}
+		//according to e, adjust whether should go upper
+		if(e<=0){
+			//different slope, different way to go upper
+			if(k){
+				x++;
+			}else{
+				y++;
+			}
+		}else{
+			x++;
+			y++;
+			//different slope, different change of e
+			if(k){
+				e=e-2*dx;
+			}else{
+				e=e-2*dy;
+			}
+		}
+	}
+}
+
+void draw_box(unsigned char x,unsigned char y,unsigned char num_x,unsigned char num_y,bit fill){
+	//x: right upper coner x
+	//y: right upper coner y
+	//num_x: number of pixels in x
+	//num_y: number os pixels in y
+	//fill: fill or not
+	if(fill){
+		unsigned char i;
+		for(i=y;i<y+num_y;i++){
+			draw_line(x,i,x+num_x-1,i);
+		}
+	}else{
+		draw_line(x,y,x,y+num_y-1);
+		draw_line(x,y,x+num_x-1,y);
+		draw_line(x+num_x-1,y+num_y-1,x+num_x-1,y);
+		draw_line(x+num_x-1,y+num_y-1,x,y+num_y-1);
+	}
+}
+
+void draw_frame(void){
+	draw_box(0,0,128,64,0);
+}
+
+void draw_circle(unsigned char x,unsigned char y,unsigned char r,bit fill){
+	//x: x of center
+	//y: y of center
+	//r: radius (number of pixels in radius)
+	//fill: fill or not
+	unsigned char a,b;
+	char d;
+	unsigned char i;
+	//initial first point
+	a=0;
+	b=r-1;
+	//initial distance
+	d=1-r;
+	while(a<=b){//Adjust if circle has been finished
+		//draw circle using a point of 1/8 circle to draw 8 points in all circle
+		if(fill){
+			for(i=a+x;i>=x-a;i--){
+				set_dot(i,b+y);
+				set_dot(i,y-b);
+			}
+			for(i=b+x;i>=x-b;i--){
+				set_dot(i,a+y);
+				set_dot(i,y-a);
+			}
+		}else{
+			set_dot(a+x,b+y);
+			set_dot(a+x,y-b);
+			set_dot(x-a,b+y);
+			set_dot(x-a,y-b);
+			set_dot(b+x,a+y);
+			set_dot(b+x,y-a);
+			set_dot(x-b,a+y);
+			set_dot(x-b,y-a);	
+		}
+		//use distance to adjust next point.
+		if(d<0){
+			d+=2*a+3;
+		}else{
+			d+=2*(a-b)+5;
+			b--;
+		}
+		a++;
+	}
+}
+
+void draw_8bits(unsigned char x,unsigned char y,unsigned char data8bit){
+	unsigned char i=8;
+	bit dot;
+	while(i>0){
+		i--;
+		dot=0x01&(data8bit>>i);
+		if(dot){
+			set_dot(x,y);
+		}
+		x++;
+	}
+}
+
+void draw_8bits90(unsigned char x,unsigned char y,unsigned char data8bit){
+	unsigned char i=8;
+	bit dot;
+	while(i>0){
+		i--;
+		dot=0x01&(data8bit>>i);
+		if(dot){
+			set_dot(x,y);
+		}
+		y++;
+	}
+}
+
+void draw_8bits180(unsigned char x,unsigned char y,unsigned char data8bit){
+	unsigned char i=8;
+	bit dot;
+	while(i>0){
+		i--;
+		dot=0x01&(data8bit>>i);
+		if(dot){
+			set_dot(x,y);
+		}
+		x--;
+	}
+}
+
+void draw_8bits270(unsigned char x,unsigned char y,unsigned char data8bit){
+	unsigned char i=8;
+	bit dot;
+	while(i>0){
+		i--;
+		dot=0x01&(data8bit>>i);
+		if(dot){
+			set_dot(x,y);
+		}
+		y--;
+	}
+}
+
+void draw_picture(unsigned char x,unsigned char y,unsigned char x_l,unsigned char y_l,unsigned char *picture){
+	//x_l and y_l must be multiples of 8. They are the picture's length(in x of original system) and width(in y of original system).
+	unsigned char i=0;
+	unsigned char j=0;
+	int num=0;
+	x_l=x_l/8;
+	while(j<y_l){
+		j++;
+		while(i<x_l){
+			i++;
+			draw_8bits(x,y,picture[num]);
+			num++;
+			x+=8;
+
+		}
+		x-=8*i;
+		i=0;
+		y++;
+	}
+}
+
+void draw_picture90(unsigned char x,unsigned char y,unsigned char x_l,unsigned char y_l,unsigned char *picture){
+	//x_l and y_l must be multiples of 8. They are the picture's length(in x of original system) and width(in y of original system).
+	unsigned char i=0;
+	unsigned char j=0;
+	int num=0;
+	x_l=x_l/8;
+	while(j<y_l){
+		j++;
+		while(i<x_l){
+			i++;
+			draw_8bits90(x,y,picture[num]);
+			num++;
+			y+=8;
+
+		}
+		y-=8*i;
+		i=0;
+		x--;
+	}
+}
+
+void draw_picture180(unsigned char x,unsigned char y,unsigned char x_l,unsigned char y_l,unsigned char *picture){
+	//x_l and y_l must be multiples of 8. They are the picture's length(in x of original system) and width(in y of original system).
+	unsigned char i=0;
+	unsigned char j=0;
+	int num=0;
+	x_l=x_l/8;
+	while(j<y_l){
+		j++;
+		while(i<x_l){
+			i++;
+			draw_8bits180(x,y,picture[num]);
+			num++;
+			x-=8;
+
+		}
+		x+=8*i;
+		i=0;
+		y--;
+	}
+}
+
+void draw_picture270(unsigned char x,unsigned char y,unsigned char x_l,unsigned char y_l,unsigned char *picture){
+	//x_l and y_l must be multiples of 8. They are the picture's length(in x of original system) and width(in y of original system).
+	unsigned char i=0;
+	unsigned char j=0;
+	int num=0;
+	x_l=x_l/8;
+	while(j<y_l){
+		j++;
+		while(i<x_l){
+			i++;
+			draw_8bits270(x,y,picture[num]);
+			num++;
+			y-=8;
+
+		}
+		y+=8*i;
+		i=0;
+		x++;
+	}
+}
+
+void display_string_58(unsigned char x,unsigned char y,unsigned char *string, unsigned int degree){
+	//degree: 0, 90, 180, 270
+	unsigned char code ASCII58[] =              // ASCII
+	{
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // - -
+
+	0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00, // -!-
+
+	0x50,0x50,0x50,0x00,0x00,0x00,0x00,0x00, // -"-
+
+	0x50,0x50,0xF8,0x50,0xF8,0x50,0x50,0x00, // -#-
+
+	0x20,0x78,0xC0,0x70,0x28,0xF0,0x20,0x00, // -$-
+
+	0xC0,0xC8,0x10,0x20,0x40,0x98,0x18,0x00, // -%-
+
+	0x40,0xA0,0xA0,0x40,0xA8,0x90,0x68,0x00, // -&-
+
+	0x30,0x20,0x40,0x00,0x00,0x00,0x00,0x00, // -'-
+
+	0x10,0x20,0x40,0x40,0x40,0x20,0x10,0x00, // -(-
+
+	0x40,0x20,0x10,0x10,0x10,0x20,0x40,0x00, // -)-
+
+	0x20,0xA8,0x70,0x20,0x70,0xA8,0x20,0x00, // -*-
+
+	0x20,0x20,0x20,0xF8,0x20,0x20,0x20,0x00, // -+-
+
+	0x00,0x00,0x00,0x00,0x60,0x40,0x80,0x00, // -,-
+
+	0x00,0x00,0x00,0xF8,0x00,0x00,0x00,0x00, // ---
+
+	0x00,0x00,0x00,0x00,0x00,0x60,0x60,0x00, // -.-
+
+	0x00,0x08,0x10,0x20,0x40,0x80,0x00,0x00, // -/-
+
+	0x70,0x88,0x98,0xA8,0xC8,0x88,0x70,0x00, // -0-
+
+	0x20,0x60,0x20,0x20,0x20,0x20,0x70,0x00, // -1-
+
+	0x70,0x88,0x08,0x30,0x40,0x80,0xF8,0x00, // -2-
+
+	0xF8,0x08,0x10,0x30,0x08,0x88,0x70,0x00, // -3-
+
+	0x10,0x30,0x50,0x90,0xF8,0x10,0x10,0x00, // -4-
+
+	0xF8,0x80,0xF0,0x08,0x08,0x88,0x70,0x00, // -5-
+
+	0x38,0x40,0x80,0xF0,0x88,0x88,0x70,0x00, // -6-
+
+	0xF8,0x08,0x10,0x20,0x40,0x40,0x40,0x00, // -7-
+
+	0x70,0x88,0x88,0x70,0x88,0x88,0x70,0x00, // -8-
+
+	0x70,0x88,0x88,0x78,0x08,0x10,0xE0,0x00, // -9-
+
+	0x00,0x60,0x60,0x00,0x60,0x60,0x00,0x00, // -:-
+
+	0x00,0x60,0x60,0x00,0x60,0x60,0x80,0x00, // -;-
+
+	0x10,0x20,0x40,0x80,0x40,0x20,0x10,0x00, // -<-
+
+	0x00,0x00,0xF8,0x00,0xF8,0x00,0x00,0x00, // -=-
+
+	0x40,0x20,0x10,0x08,0x10,0x20,0x40,0x00, // ->-
+
+	0x70,0x88,0x10,0x20,0x20,0x00,0x20,0x00, // -?-
+
+	0x70,0x88,0xB8,0xA8,0xB8,0x80,0x78,0x00, // -@-
+
+	0x20,0x50,0x88,0x88,0xF8,0x88,0x88,0x00, // -A-
+
+	0xF0,0x88,0x88,0xF0,0x88,0x88,0xF0,0x00, // -B-
+
+	0x70,0x88,0x80,0x80,0x80,0x88,0x70,0x00, // -C-
+
+	0xF0,0x88,0x88,0x88,0x88,0x88,0xF0,0x00, // -D-
+
+	0xF8,0x80,0x80,0xF0,0x80,0x80,0xF8,0x00, // -E-
+
+	0xF8,0x80,0x80,0xF0,0x80,0x80,0x80,0x00, // -F-
+
+	0x70,0x88,0x80,0x80,0xB8,0x88,0x78,0x00, // -G-
+
+	0x88,0x88,0x88,0xF8,0x88,0x88,0x88,0x00, // -H-
+
+	0x70,0x20,0x20,0x20,0x20,0x20,0x70,0x00, // -I-
+
+	0x38,0x10,0x10,0x10,0x10,0x90,0x60,0x00, // -J-
+
+	0x88,0x90,0xA0,0xC0,0xA0,0x90,0x88,0x00, // -K-
+
+	0x80,0x80,0x80,0x80,0x80,0x80,0xF8,0x00, // -L-
+
+	0x88,0xD8,0xA8,0xA8,0x88,0x88,0x88,0x00, // -M-
+
+	0x88,0x88,0xC8,0xA8,0x98,0x88,0x88,0x00, // -N-
+
+	0x70,0x88,0x88,0x88,0x88,0x88,0x70,0x00, // -O-
+
+	0xF0,0x88,0x88,0xF0,0x80,0x80,0x80,0x00, // -P-
+
+	0x70,0x88,0x88,0x88,0xA8,0x90,0x68,0x00, // -Q-
+
+	0xF0,0x88,0x88,0xF0,0xA0,0x90,0x88,0x00, // -R-
+
+	0x70,0x88,0x80,0x70,0x08,0x88,0x70,0x00, // -S-
+
+	0xF8,0x20,0x20,0x20,0x20,0x20,0x20,0x00, // -T-
+
+	0x88,0x88,0x88,0x88,0x88,0x88,0x70,0x00, // -U-
+
+	0x88,0x88,0x88,0x88,0x88,0x50,0x20,0x00, // -V-
+
+	0x88,0x88,0x88,0xA8,0xA8,0xD8,0x88,0x00, // -W-
+
+	0x88,0x88,0x50,0x20,0x50,0x88,0x88,0x00, // -X-
+
+	0x88,0x88,0x50,0x20,0x20,0x20,0x20,0x00, // -Y-
+
+	0xF8,0x08,0x10,0x20,0x40,0x80,0xF8,0x00, // -Z-
+
+	0xF0,0xC0,0xC0,0xC0,0xC0,0xC0,0xF0,0x00, // -[-
+
+	0x00,0x80,0x40,0x20,0x10,0x08,0x00,0x00, // -\-
+
+	0x78,0x18,0x18,0x18,0x18,0x18,0x78,0x00, // -]-
+
+	0x20,0x70,0xA8,0x20,0x20,0x20,0x20,0x00, // -^-
+
+	0x00,0x20,0x40,0xF8,0x40,0x20,0x00,0x00, // -_-
+
+	0x20,0x10,0x08,0x00,0x00,0x00,0x00,0x00, // -`-
+
+	0x00,0x00,0xE0,0x10,0x70,0x90,0x68,0x00, // -a-
+
+	0x80,0x80,0xB0,0xC8,0x88,0xC8,0xB0,0x00, // -b-
+
+	0x00,0x00,0x70,0x88,0x80,0x80,0x70,0x00, // -c-
+
+	0x08,0x08,0x68,0x98,0x88,0x98,0x68,0x00, // -d-
+
+	0x00,0x00,0x70,0x88,0xF0,0x80,0x70,0x00, // -e-
+
+	0x30,0x48,0x40,0xF0,0x40,0x40,0x40,0x00, // -f-
+
+	0x00,0x00,0x70,0x88,0x88,0x78,0x08,0xF0, // -g-
+
+	0x80,0x80,0xB0,0xC8,0x88,0x88,0x88,0x00, // -h-
+
+	0x20,0x00,0x00,0x20,0x20,0x20,0x20,0x00, // -i-
+
+	0x10,0x00,0x00,0x30,0x10,0x10,0x10,0x60, // -j-
+
+	0x80,0x80,0x90,0xA0,0xC0,0xA0,0x98,0x00, // -k-
+
+	0x60,0x20,0x20,0x20,0x20,0x20,0x70,0x00, // -l-
+
+	0x00,0x00,0x50,0xA8,0xA8,0xA8,0xA8,0x00, // -m-
+
+	0x00,0x00,0xB0,0x48,0x48,0x48,0x48,0x00, // -n-
+
+	0x00,0x00,0x70,0x88,0x88,0x88,0x70,0x00, // -o-
+
+	0x00,0x00,0xF0,0x88,0x88,0xF0,0x80,0x80, // -p-
+
+	0x00,0x00,0x78,0x88,0x88,0x78,0x08,0x08, // -q-
+
+	0x00,0x00,0xB0,0x48,0x40,0x40,0x40,0x00, // -r-
+
+	0x00,0x00,0x78,0x80,0x70,0x08,0xF0,0x00, // -s-
+
+	0x40,0x40,0xF8,0x40,0x40,0x48,0x30,0x00, // -t-
+
+	0x00,0x00,0x90,0x90,0x90,0x90,0x68,0x00, // -u-
+
+	0x00,0x00,0x88,0x88,0x88,0x50,0x20,0x00, // -v-
+
+	0x00,0x00,0xA8,0xA8,0xA8,0xA8,0x50,0x00, // -w-
+
+	0x00,0x00,0x88,0x50,0x20,0x50,0x88,0x00, // -x-
+
+	0x00,0x00,0x88,0x88,0x98,0x68,0x08,0xF0, // -y-
+
+	0x00,0x00,0xF8,0x10,0x20,0x40,0xF8,0x00, // -z-
+
+	0x20,0x40,0x40,0x80,0x40,0x40,0x20,0x00, // -{-
+
+	0x20,0x20,0x20,0x00,0x20,0x20,0x20,0x00, // -|-
+
+	0x20,0x10,0x10,0x08,0x10,0x10,0x20,0x00, // -}-
+
+	0x00,0x00,0x40,0xA8,0x10,0x00,0x00,0x00
+	};
+	unsigned int i;
+	unsigned int maxnum=strlen(string);
+	unsigned int num;
+	unsigned char m,n;
+	unsigned char x_l=1;
+	unsigned char y_l=8;
+	unsigned char b=y;
+	unsigned char a=x;
+	if(degree==0){
+		for(i=0;i<maxnum;i++){
+			x=a+6*i;
+			y=b;
+			num=(string[i]-32)*8;
+			//
+			m=0;
+			n=0;
+			while(n<y_l){
+				n++;
+				while(m<x_l){
+					m++;
+					draw_8bits(x,y,ASCII58[num]);
+					num++;
+					x+=8;
+
+				}
+				x-=8*m;
+				m=0;
+				y++;
+			}
+		}
+	}
+	else if(degree==90){
+		for(i=0;i<maxnum;i++){
+			x=a;
+			y=b+6*i;
+			num=(string[i]-32)*8;
+			//
+			m=0;
+			n=0;
+			while(n<y_l){
+				n++;
+				while(m<x_l){
+					m++;
+					draw_8bits90(x,y,ASCII58[num]);
+					num++;
+					y+=8;
+
+				}
+				y-=8*m;
+				m=0;
+				x--;
+			}
+		}
+	}else if(degree==180){
+		for(i=0;i<maxnum;i++){
+			x=a-6*i;
+			y=b;
+			num=(string[i]-32)*8;
+			//
+			m=0;
+			n=0;
+			while(n<y_l){
+				n++;
+				while(m<x_l){
+					m++;
+					draw_8bits180(x,y,ASCII58[num]);
+					num++;
+					x-=8;
+
+				}
+				x+=8*m;
+				m=0;
+				y--;
+			}
+		}
+	}else if(degree==270){
+		for(i=0;i<maxnum;i++){
+			x=a;
+			y=b-6*i;
+			num=(string[i]-32)*8;
+			//
+			m=0;
+			n=0;
+			while(n<y_l){
+				n++;
+				while(m<x_l){
+					m++;
+					draw_8bits270(x,y,ASCII58[num]);
+					num++;
+					y-=8;
+
+				}
+				y+=8*m;
+				m=0;
+				x++;
+			}
+		}
+	}
+}

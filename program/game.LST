@@ -1,0 +1,125 @@
+C51 COMPILER V8.02   GAME                                                                  10/17/2013 23:53:58 PAGE 1   
+
+
+C51 COMPILER V8.02, COMPILATION OF MODULE GAME
+OBJECT MODULE PLACED IN game.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE game.c OMF2 BROWSE DEBUG
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include "game.h"
+   3          #include "lcd12864.h"
+   4          
+   5          unsigned char direct[]={2,2,2,2,2};//1:left  2:right  3:up  4:down
+   6          unsigned char snakex[]={60,61,62,63,64};
+   7          unsigned char snakey[]={32,32,32,32,32};
+   8          unsigned int snakelen=5;
+   9          unsigned char situation=0;//0: move  1: edge  2:eat
+  10          sbit leftb=P3^0;
+  11          sbit rightb=P3^1;
+  12          sbit upb=P3^2;
+  13          sbit downb=P3^3;
+  14          
+  15          unsigned char code finish_string[]={"×²Ç½¶øËÀ"};
+  16          
+  17          void game_init(void){
+  18   1              draw_line(snakex[0],snakey[0],snakex[4],snakey[4]);
+  19   1      }
+  20          
+  21          void button(void){
+  22   1              if(!leftb){
+  23   2                      if(direct[snakelen-2]!=2){
+  24   3                              direct[snakelen-1]=1;
+  25   3                      }
+  26   2              }else if(!rightb){
+  27   2                      if(direct[snakelen-2]!=1){
+  28   3                              direct[snakelen-1]=2;
+  29   3                      }
+  30   2              }else if(!upb){
+  31   2                      if(direct[snakelen-2]!=4){
+  32   3                              direct[snakelen-1]=3;
+  33   3                      }
+  34   2              }else if(!downb){
+  35   2                      if(direct[snakelen-2]!=3){
+  36   3                              direct[snakelen-1]=4;
+  37   3                      }
+  38   2              }
+  39   1      }
+  40          
+  41          void move(void){
+  42   1              unsigned char i;
+  43   1              //determien situation
+  44   1              i=snakelen;
+  45   1              switch(direct[i-1]){
+  46   2                      case 1: 
+  47   2                              if(snakex[i-1]==127){
+  48   3                                      situation=1;
+  49   3                              } 
+  50   2                              break;
+  51   2                      case 2: 
+  52   2                              if(snakex[i-1]==0){
+  53   3                                      situation=1;
+  54   3                              } 
+  55   2                              break;
+C51 COMPILER V8.02   GAME                                                                  10/17/2013 23:53:58 PAGE 2   
+
+  56   2                      case 3: 
+  57   2                              if(snakey[i-1]==0){
+  58   3                                      situation=1;
+  59   3                              } 
+  60   2                              break;
+  61   2                      case 4: 
+  62   2                              if(snakey[i-1]==63){
+  63   3                                      situation=1;
+  64   3                              } 
+  65   2                              break;
+  66   2                      default: break;         
+  67   2              }
+  68   1              //move
+  69   1              if(situation==0){
+  70   2                      for(i=0;i<snakelen;i++){
+  71   3                              switch(direct[i]){
+  72   4                                      case 1: snakex[i]-=1;break;
+  73   4                                      case 2: snakex[i]+=1;break;
+  74   4                                      case 3: snakey[i]-=1;break;
+  75   4                                      case 4: snakey[i]+=1;break;
+  76   4                                      default: break;
+  77   4                              }
+  78   3                              if(i!=snakelen-1){
+  79   4                                      direct[i]=direct[i+1];
+  80   4                              }
+  81   3                      }
+  82   2              }
+  83   1      }
+  84          
+  85          void draw(void){
+  86   1              unsigned char i;
+  87   1              first_page();
+  88   1              if(situation==0){
+  89   2                      for(i=0;i<snakelen;i++){
+  90   3                              set_dot(snakex[i],snakey[i]);
+  91   3                      }
+  92   2              }else if(situation==1){
+  93   2                      display_string(2,2,finish_string);
+  94   2                      while(1);
+  95   2              }
+  96   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    304    ----
+   CONSTANT SIZE    =      9    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     18       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

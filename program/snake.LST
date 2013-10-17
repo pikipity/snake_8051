@@ -1,0 +1,55 @@
+C51 COMPILER V8.02   SNAKE                                                                 10/17/2013 23:53:58 PAGE 1   
+
+
+C51 COMPILER V8.02, COMPILATION OF MODULE SNAKE
+OBJECT MODULE PLACED IN snake.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE snake.c OMF2 BROWSE DEBUG
+
+line level    source
+
+   1          #include <stdlib.h>
+   2          #include "Main.h"
+   3          #include "2_01_12g.H"
+   4          #include "lcd12864.h"
+   5          #include "game.h"
+   6          
+   7          void main(void) {
+   8   1        // Set up the scheduler 
+   9   1        SCH_Init_T2();
+  10   1      
+  11   1        //init lcd
+  12   1        lcd_init();
+  13   1        game_init();
+  14   1        
+  15   1        //add task
+  16   1        //SCH_Add_Task(draw, 0, 20);
+  17   1        SCH_Add_Task(move, 0, 500);
+  18   1        SCH_Add_Task(draw,0,20);
+  19   1      
+  20   1      
+  21   1        //start task
+  22   1        SCH_Start();
+  23   1      
+  24   1        while(1) {
+  25   2                      SCH_Dispatch_Tasks();
+  26   2                      button();
+  27   2        }
+  28   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     48    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

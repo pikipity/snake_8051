@@ -1,0 +1,8 @@
+"snake.obj",
+"lcd12864.obj",
+"2_01_12g.obj",
+"Sch51.obj",
+"game.obj" 
+TO "snake" 
+
+REMOVEUNUSED 
