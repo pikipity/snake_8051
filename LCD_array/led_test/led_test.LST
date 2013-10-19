@@ -1,0 +1,190 @@
+C51 COMPILER V8.02   LED_TEST                                                              10/19/2013 10:05:36 PAGE 1   
+
+
+C51 COMPILER V8.02, COMPILATION OF MODULE LED_TEST
+OBJECT MODULE PLACED IN led_test.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE led_test.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <intrins.h>
+   2          #include "MAIN.h"
+   3          #include "Sch51.h"
+   4          #include "2_01_12g.h"
+   5          
+   6          #define LEDdata P0
+   7          #define row12 P1
+   8          #define row34 P2
+   9          
+  10          sbit E1=P3^0;
+  11          sbit E2=P3^1;
+  12          sbit E3=P3^2;
+  13          sbit E4=P3^3;
+  14          
+  15          unsigned char LEDarray[]={//LED1
+  16                                                            0x00,
+  17                                                            0x00,
+  18                                                            0x00,
+  19                                                            0x00,
+  20                                                            0x00,
+  21                                                            0x00,
+  22                                                            0x00,
+  23                                                            0x00,
+  24                                                            //LED2
+  25                                                            0x00,
+  26                                                            0x00,
+  27                                                            0x00,
+  28                                                            0x00,
+  29                                                            0x00,
+  30                                                            0x00,
+  31                                                            0x00,
+  32                                                            0x00,
+  33                                                            //LED3
+  34                                                            0x00,
+  35                                                            0x00,
+  36                                                            0x00,
+  37                                                            0x00,
+  38                                                            0x00,
+  39                                                            0x00,
+  40                                                            0x00,
+  41                                                            0x00,
+  42                                                            //LED4
+  43                                                            0x00,
+  44                                                            0x00,
+  45                                                            0x00,
+  46                                                            0x00,
+  47                                                            0x00,
+  48                                                            0x00,
+  49                                                            0x00,
+  50                                                            0x00};
+  51          
+  52          void led_init(){
+  53   1              E1=0;
+  54   1              E2=0;
+  55   1              E3=0;
+C51 COMPILER V8.02   LED_TEST                                                              10/19/2013 10:05:36 PAGE 2   
+
+  56   1              E4=0;
+  57   1              LEDdata=0;
+  58   1              row12=0;
+  59   1              row34=0;
+  60   1      }
+  61          
+  62          void draw1(){
+  63   1                      static unsigned char i1=1;
+  64   1                      static unsigned char k1=0;
+  65   1                      E3=0;
+  66   1                      E4=0;
+  67   1                      if(i1==1){
+  68   2                              E2=0;
+  69   2                              E1=1;
+  70   2                              row12=k1;
+  71   2                              LEDdata=LEDarray[k1];
+  72   2                      }else{
+  73   2                              E1=0;
+  74   2                              E2=1;
+  75   2                              row12=k1<<3;
+  76   2                              LEDdata=LEDarray[k1+8];
+  77   2      
+  78   2                      }
+  79   1                      if(7==k1++){
+  80   2                              k1=0;
+  81   2                              if(2==i1++) i1=1;
+  82   2                      }
+  83   1      }
+  84          
+  85          void draw2(){
+  86   1               static unsigned char i2=1;
+  87   1              static unsigned char k2=0;
+  88   1              E1=0;
+  89   1              E2=0;
+  90   1              if(i2==1){
+  91   2                              E4=0;
+  92   2                              E3=1;
+  93   2                              row34=k2;
+  94   2                              LEDdata=LEDarray[k2+16];
+  95   2                      }else{
+  96   2                              E3=0;
+  97   2                              E4=1;
+  98   2                              row34=k2<<3;
+  99   2                              LEDdata=LEDarray[k2+24];
+ 100   2                      }
+ 101   1                      if(7==k2++){
+ 102   2                              k2=0;
+ 103   2                              if(2==i2++) i2=1;
+ 104   2                      }
+ 105   1                      
+ 106   1      }
+ 107          
+ 108          void set_dot(unsigned char x,unsigned char y){
+ 109   1              unsigned char xbit,ybit,screen,arry_row,rdata,ybyte,xbyte;
+ 110   1              if(x<16 & y<16){
+ 111   2                      xbyte=x/8;
+ 112   2                      xbit=x%8;
+ 113   2                      ybyte=y/8;
+ 114   2                      ybit=y%8;
+ 115   2                      //screen
+ 116   2                      screen=ybyte*2+xbyte;
+ 117   2                      //row
+C51 COMPILER V8.02   LED_TEST                                                              10/19/2013 10:05:36 PAGE 3   
+
+ 118   2                      arry_row=screen*8+ybit;
+ 119   2                      //data
+ 120   2                      rdata=0x01<<xbit;
+ 121   2                      //write
+ 122   2                      LEDarray[arry_row]|=rdata;
+ 123   2              }
+ 124   1      }
+ 125          
+ 126          void clear_dot(unsigned char x,unsigned char y){
+ 127   1              unsigned char xbit,ybit,screen,arry_row,rdata,ybyte,xbyte;
+ 128   1              if(x<16 & y<16){
+ 129   2                      xbyte=x/8;
+ 130   2                      xbit=x%8;
+ 131   2                      ybyte=y/8;
+ 132   2                      ybit=y%8;
+ 133   2                      //screen
+ 134   2                      screen=ybyte*2+xbyte;
+ 135   2                      //row
+ 136   2                      arry_row=screen*8+ybit;
+ 137   2                      //data
+ 138   2                      rdata=0xFE<<xbit;
+ 139   2                      //write
+ 140   2                      LEDarray[arry_row]&=rdata;
+ 141   2              }
+ 142   1      }
+ 143          
+ 144          void main(){
+ 145   1              SCH_Init_T2();
+ 146   1              set_dot(0,0);
+ 147   1              set_dot(1,0);
+ 148   1              set_dot(0,1);
+ 149   1              set_dot(0,9);
+ 150   1              clear_dot(0,0);
+ 151   1              set_dot(9,0);
+ 152   1              set_dot(9,9);
+ 153   1      
+ 154   1              led_init();
+ 155   1      
+ 156   1              SCH_Add_Task(draw1,0,2);
+ 157   1              SCH_Add_Task(draw2,1,2);
+ 158   1      
+ 159   1              SCH_Start();
+ 160   1              while(1){
+ 161   2                      SCH_Dispatch_Tasks();   
+ 162   2              }
+ 163   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    394    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     36    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,50 @@
+C51 COMPILER V8.02   MAIN                                                                  10/19/2013 13:32:26 PAGE 1   
+
+
+C51 COMPILER V8.02, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "MAIN.h"
+   2          #include "Sch51.h"
+   3          #include "2_01_12g.h"
+   4          #include "ledarray.h"
+   5          #include "game.h"
+   6          
+   7          unsigned int count=0;
+   8          
+   9          void main(){
+  10   1              SCH_Init_T2();
+  11   1      
+  12   1              led_init();
+  13   1      
+  14   1              SCH_Add_Task(draw1,0,2);
+  15   1              SCH_Add_Task(draw2,1,2);
+  16   1              SCH_Add_Task(draw,0,33);
+  17   1      
+  18   1              SCH_Start();
+  19   1              while(1){
+  20   2                      SCH_Dispatch_Tasks();
+  21   2                      button();
+  22   2                      if(500==count++){
+  23   3                              count=0;
+  24   3                              move();
+  25   3                      }       
+  26   2              }
+  27   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     86    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,7 @@
+"Sch51.obj",
+"2_01_12g.obj",
+"main.obj",
+"ledarray.obj",
+"game.obj" 
+TO "snake" 
+RAMSIZE(256) 

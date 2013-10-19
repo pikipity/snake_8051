@@ -1,0 +1,165 @@
+C51 COMPILER V8.02   LEDARRAY                                                              10/19/2013 13:32:26 PAGE 1   
+
+
+C51 COMPILER V8.02, COMPILATION OF MODULE LEDARRAY
+OBJECT MODULE PLACED IN ledarray.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE ledarray.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include "ledarray.h"
+   3          
+   4          unsigned char LEDarraydata[]={//LED1
+   5                                                            0x00,
+   6                                                            0x00,
+   7                                                            0x00,
+   8                                                            0x00,
+   9                                                            0x00,
+  10                                                            0x00,
+  11                                                            0x00,
+  12                                                            0x00,
+  13                                                            //LED2
+  14                                                            0x00,
+  15                                                            0x00,
+  16                                                            0x00,
+  17                                                            0x00,
+  18                                                            0x00,
+  19                                                            0x00,
+  20                                                            0x00,
+  21                                                            0x00,
+  22                                                            //LED3
+  23                                                            0x00,
+  24                                                            0x00,
+  25                                                            0x00,
+  26                                                            0x00,
+  27                                                            0x00,
+  28                                                            0x00,
+  29                                                            0x00,
+  30                                                            0x00,
+  31                                                            //LED4
+  32                                                            0x00,
+  33                                                            0x00,
+  34                                                            0x00,
+  35                                                            0x00,
+  36                                                            0x00,
+  37                                                            0x00,
+  38                                                            0x00,
+  39                                                            0x00};
+  40          
+  41          void led_init(){
+  42   1              E1=0;
+  43   1              E2=0;
+  44   1              E3=0;
+  45   1              E4=0;
+  46   1              LEDdata=0;
+  47   1              row12=0;
+  48   1              row34=0;
+  49   1      }
+  50          
+  51          void draw1(){
+  52   1                      static unsigned char i1=1;
+  53   1                      static unsigned char k1=0;
+  54   1                      E3=0;
+  55   1                      E4=0;
+C51 COMPILER V8.02   LEDARRAY                                                              10/19/2013 13:32:26 PAGE 2   
+
+  56   1                      if(i1==1){
+  57   2                              E2=0;
+  58   2                              E1=1;
+  59   2                              row12=k1;
+  60   2                              LEDdata=LEDarraydata[k1];
+  61   2                      }else{
+  62   2                              E1=0;
+  63   2                              E2=1;
+  64   2                              row12=k1<<3;
+  65   2                              LEDdata=LEDarraydata[k1+8];
+  66   2      
+  67   2                      }
+  68   1                      if(7==k1++){
+  69   2                              k1=0;
+  70   2                              if(2==i1++) i1=1;
+  71   2                      }
+  72   1      }
+  73          
+  74          void draw2(){
+  75   1              static unsigned char i2=1;
+  76   1              static unsigned char k2=0;
+  77   1              E1=0;
+  78   1              E2=0;
+  79   1              if(i2==1){
+  80   2                              E4=0;
+  81   2                              E3=1;
+  82   2                              row34=k2;
+  83   2                              LEDdata=LEDarraydata[k2+16];
+  84   2                      }else{
+  85   2                              E3=0;
+  86   2                              E4=1;
+  87   2                              row34=k2<<3;
+  88   2                              LEDdata=LEDarraydata[k2+24];
+  89   2                      }
+  90   1                      if(7==k2++){
+  91   2                              k2=0;
+  92   2                              if(2==i2++) i2=1;
+  93   2                      }
+  94   1                      
+  95   1      }
+  96          
+  97          void set_dot(unsigned char x,unsigned char y){
+  98   1              unsigned char xbit,ybit,screen,arry_row,rdata,ybyte,xbyte;
+  99   1              if(x<16 & y<16){
+ 100   2                      xbyte=x/8;
+ 101   2                      xbit=x%8;
+ 102   2                      ybyte=y/8;
+ 103   2                      ybit=y%8;
+ 104   2                      //screen
+ 105   2                      screen=ybyte*2+xbyte;
+ 106   2                      //row
+ 107   2                      arry_row=screen*8+ybit;
+ 108   2                      //data
+ 109   2                      rdata=0x01<<xbit;
+ 110   2                      //write
+ 111   2                      LEDarraydata[arry_row]|=rdata;
+ 112   2              }
+ 113   1      }
+ 114          
+ 115          bit read_dot(unsigned char x,unsigned char y){
+ 116   1              unsigned char xbit,ybit,screen,arry_row,ybyte,xbyte;
+ 117   1              unsigned char rdata;
+C51 COMPILER V8.02   LEDARRAY                                                              10/19/2013 13:32:26 PAGE 3   
+
+ 118   1              if(x<16 & y<16){
+ 119   2                      xbyte=x/8;
+ 120   2                      xbit=x%8;
+ 121   2                      ybyte=y/8;
+ 122   2                      ybit=y%8;
+ 123   2                      //screen
+ 124   2                      screen=ybyte*2+xbyte;
+ 125   2                      //row
+ 126   2                      arry_row=screen*8+ybit;
+ 127   2                      //read
+ 128   2                      rdata=LEDarraydata[arry_row]>>xbit;
+ 129   2                      return rdata&0x01;
+ 130   2              }
+ 131   1      }
+ 132          
+ 133          void first_page(){
+ 134   1              unsigned char i;
+ 135   1              for(i=0;i<32;i++){
+ 136   2              LEDarraydata[i]=0x00;
+ 137   2              }
+ 138   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    309    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     36    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

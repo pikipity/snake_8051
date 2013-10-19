@@ -1,0 +1,5 @@
+"led_test.obj",
+"Sch51.obj",
+"2_01_12g.obj" 
+TO "led_test" 
+RAMSIZE(256) 
