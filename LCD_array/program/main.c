@@ -19,7 +19,7 @@ void main(){
 	while(1){
 		SCH_Dispatch_Tasks();
 		button();
-		if(500==count++){
+		if(400==count++){
 			count=0;
 			move();
 		}	

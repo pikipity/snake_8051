@@ -1,4 +1,4 @@
-C51 COMPILER V8.02   GAME                                                                  10/19/2013 13:32:26 PAGE 1   
+C51 COMPILER V8.02   GAME                                                                  10/19/2013 18:15:31 PAGE 1   
 
 
 C51 COMPILER V8.02, COMPILATION OF MODULE GAME
@@ -11,11 +11,11 @@ line level    source
    2          #include "game.h"
    3          #include "ledarray.h"
    4          
-   5          static unsigned char direct[]={2,2,2,2,2,2};//1:left  2:right  3:up  4:down
-   6          static unsigned char snakex[]={0,1,2,3,4,5};
-   7          static unsigned char snakey[]={0,0,0,0,0,0};
-   8          static unsigned int snakelen=6;
-   9          static unsigned char situation=0;//0: move  1: edge  2:eat
+   5          static unsigned char direct[]={2,2,0,0,0,0,0,0};//1:left  2:right  3:up  4:down
+   6          static unsigned char snakex[]={0,1,17,17,17,17,17,17};
+   7          static unsigned char snakey[]={0,0,0,0,0,0,0,0};
+   8          static unsigned int snakelen=2;
+   9          static unsigned char situation=0;//0: move  1: edge  2:eat  4:win
   10          
   11          unsigned char code die[]={//D
   12                                                            0x1E,0x32,0x62,0x42,0x42,0x62,0x32,0x1E,
@@ -27,112 +27,207 @@ line level    source
   18                                                            0x18,0x18,0x18,0x18,0x18,0x18,0x00,0x18
   19                                                            };
   20          
-  21          extern unsigned char LEDarraydata[];
-  22          
-  23          sbit leftb=P3^4;
-  24          sbit rightb=P3^5;
-  25          sbit upb=P3^6;
-  26          sbit downb=P3^7;
-  27          
-  28          void button(void){
-  29   1              if(!leftb){
-  30   2                      if(direct[snakelen-2]!=2){
-  31   3                              direct[snakelen-1]=1;
-  32   3                      }
-  33   2              }else if(!rightb){
-  34   2                      if(direct[snakelen-2]!=1){
-  35   3                              direct[snakelen-1]=2;
-  36   3                      }
-  37   2              }else if(!upb){
-  38   2                      if(direct[snakelen-2]!=4){
-  39   3                              direct[snakelen-1]=3;
-  40   3                      }
-  41   2              }else if(!downb){
-  42   2                      if(direct[snakelen-2]!=3){
-  43   3                              direct[snakelen-1]=4;
-  44   3                      }
-  45   2              }
-  46   1      }
-  47          
-  48          
-  49          void move(void){
-  50   1              unsigned char i;
-  51   1              //determien situation
-  52   1              i=snakelen;
-  53   1              switch(direct[i-1]){
-  54   2                      case 1: 
-  55   2                              if(snakex[i-1]==0){
-C51 COMPILER V8.02   GAME                                                                  10/19/2013 13:32:26 PAGE 2   
+  21          unsigned char code win[]={//W
+  22                                                            0x81,0x81,0x99,0x99,0x99,0x99,0x99,0x66,
+  23                                                            //I
+  24                                                            0x3C,0x18,0x18,0x18,0x18,0x18,0x18,0x3C,
+  25                                                            //N
+  26                                                            0xC7,0xCF,0xCB,0xDB,0xD3,0xF3,0xE3,0xE3,
+  27                                                            //!
+  28                                                            0x18,0x18,0x18,0x18,0x18,0x18,0x00,0x18
+  29                                                            };
+  30          
+  31          unsigned char code foodx[]={0,8,10,5,4,15};
+  32          unsigned char code foody[]={8,8,0,0,5,12};
+  33          unsigned char food[]={1,1,1,1,1,1};
+  34          
+  35          extern unsigned char LEDarraydata[];
+  36          
+  37          sbit leftb=P3^4;
+  38          sbit rightb=P3^5;
+  39          sbit upb=P3^6;
+  40          sbit downb=P3^7;
+  41          
+  42          void button(void){
+  43   1              if(!leftb){
+  44   2                      if(direct[snakelen-2]!=2){
+  45   3                              direct[snakelen-1]=1;
+  46   3                      }
+  47   2              }else if(!rightb){
+  48   2                      if(direct[snakelen-2]!=1){
+  49   3                              direct[snakelen-1]=2;
+  50   3                      }
+  51   2              }else if(!upb){
+  52   2                      if(direct[snakelen-2]!=4){
+  53   3                              direct[snakelen-1]=3;
+  54   3                      }
+  55   2              }else if(!downb){
+C51 COMPILER V8.02   GAME                                                                  10/19/2013 18:15:31 PAGE 2   
 
-  56   3                                      situation=1;
-  57   3                              }else if(read_dot(snakex[i-1]-1,snakey[i-1])){
-  58   3                                      situation=1;
-  59   3                              } 
-  60   2                              break;
-  61   2                      case 2: 
-  62   2                              if(snakex[i-1]==15){
-  63   3                                      situation=1;
-  64   3                              }else if(read_dot(snakex[i-1]+1,snakey[i-1])){
-  65   3                                      situation=1;
-  66   3                              } 
-  67   2                              break;
-  68   2                      case 3: 
-  69   2                              if(snakey[i-1]==0){
-  70   3                                      situation=1;
-  71   3                              }else if(read_dot(snakex[i-1],snakey[i-1]-1)){
-  72   3                                      situation=1;
-  73   3                              } 
-  74   2                              break;
-  75   2                      case 4: 
-  76   2                              if(snakey[i-1]==15){
-  77   3                                      situation=1;
-  78   3                              }else if(read_dot(snakex[i-1]+1,snakey[i-1]+1)){
-  79   3                                      situation=1;
-  80   3                              } 
-  81   2                              break;
-  82   2                      default: break;         
-  83   2              }
-  84   1              if(situation==0){
-  85   2                      for(i=0;i<snakelen;i++){
-  86   3                              switch(direct[i]){
-  87   4                                      case 1: snakex[i]-=1;break;
-  88   4                                      case 2: snakex[i]+=1;break;
-  89   4                                      case 3: snakey[i]-=1;break;
-  90   4                                      case 4: snakey[i]+=1;break;
-  91   4                                      default: break;
-  92   4                              }
-  93   3                              if(i!=snakelen-1){
-  94   4                                      direct[i]=direct[i+1];
-  95   4                              }
-  96   3                      }
-  97   2              }
-  98   1      }
-  99          
- 100          void draw(void){
- 101   1              unsigned char i;
- 102   1              first_page();
- 103   1              if(situation==0){
- 104   2                      for(i=0;i<snakelen;i++){
- 105   3                              set_dot(snakex[i],snakey[i]);
- 106   3                      }
- 107   2              }else if(situation==1){
- 108   2                      for(i=0;i<32;i++){
- 109   3                              LEDarraydata[i]=die[i];
- 110   3                      }
- 111   2              }
- 112   1      }
+  56   2                      if(direct[snakelen-2]!=3){
+  57   3                              direct[snakelen-1]=4;
+  58   3                      }
+  59   2              }
+  60   1      }
+  61          
+  62          
+  63          void move(void){
+  64   1              unsigned char i;
+  65   1              bit error=1;
+  66   1              unsigned char j;
+  67   1              bit havefood=0;
+  68   1              //determien situation
+  69   1              i=snakelen;
+  70   1              switch(direct[i-1]){
+  71   2                      case 1: 
+  72   2                              if(snakex[i-1]==0){
+  73   3                                      situation=1;
+  74   3                              }else if(read_dot(snakex[i-1]-1,snakey[i-1])){
+  75   3                                      for(j=0;j<6;j++){
+  76   4                                              if(snakex[i-1]-1==foodx[j] && snakey[i-1]==foody[j]){
+  77   5                                                      food[j]=0;
+  78   5                                                      snakex[snakelen]=snakex[i-1]-1;
+  79   5                                                      snakey[snakelen]=snakey[i-1];
+  80   5                                                      direct[snakelen]=direct[snakelen-1];
+  81   5                                                      snakelen++;
+  82   5                                                      error=0;
+  83   5                                                      situation=2;
+  84   5                                                      break;
+  85   5                                              }
+  86   4                                      }
+  87   3                                      if (error){
+  88   4                                              situation=1;
+  89   4                                      }
+  90   3                              } 
+  91   2                              break;
+  92   2                      case 2: 
+  93   2                              if(snakex[i-1]==15){
+  94   3                                      situation=1;
+  95   3                              }else if(read_dot(snakex[i-1]+1,snakey[i-1])){
+  96   3                                      for(j=0;j<6;j++){
+  97   4                                              if(snakex[i-1]+1==foodx[j] && snakey[i-1]==foody[j]){
+  98   5                                                      food[j]=0;
+  99   5                                                      snakex[snakelen]=snakex[i-1]+1;
+ 100   5                                                      snakey[snakelen]=snakey[i-1];
+ 101   5                                                      direct[snakelen]=direct[snakelen-1];
+ 102   5                                                      snakelen++;
+ 103   5                                                      error=0;
+ 104   5                                                      situation=2;
+ 105   5                                                      break;
+ 106   5                                              }
+ 107   4                                      }
+ 108   3                                      if (error){
+ 109   4                                              situation=1;
+ 110   4                                      }
+ 111   3                              } 
+ 112   2                              break;
+ 113   2                      case 3: 
+ 114   2                              if(snakey[i-1]==0){
+ 115   3                                      situation=1;
+ 116   3                              }else if(read_dot(snakex[i-1],snakey[i-1]-1)){
+ 117   3                                      for(j=0;j<6;j++){
+C51 COMPILER V8.02   GAME                                                                  10/19/2013 18:15:31 PAGE 3   
+
+ 118   4                                              if(snakex[i-1]==foodx[j] && snakey[i-1]-1==foody[j]){
+ 119   5                                                      food[j]=0;
+ 120   5                                                      snakex[snakelen]=snakex[i-1];
+ 121   5                                                      snakey[snakelen]=snakey[i-1]-1;
+ 122   5                                                      direct[snakelen]=direct[snakelen-1];
+ 123   5                                                      snakelen++;
+ 124   5                                                      error=0;
+ 125   5                                                      situation=2;
+ 126   5                                                      break;
+ 127   5                                              }
+ 128   4                                      }
+ 129   3                                      if (error){
+ 130   4                                              situation=1;
+ 131   4                                      }
+ 132   3                              } 
+ 133   2                              break;
+ 134   2                      case 4: 
+ 135   2                              if(snakey[i-1]==15){
+ 136   3                                      situation=1;
+ 137   3                              }else if(read_dot(snakex[i-1],snakey[i-1]+1)){
+ 138   3                                      for(j=0;j<6;j++){
+ 139   4                                              if(snakex[i-1]==foodx[j] && snakey[i-1]+1==foody[j]){
+ 140   5                                                      food[j]=0;
+ 141   5                                                      snakex[snakelen]=snakex[i-1];
+ 142   5                                                      snakey[snakelen]=snakey[i-1]+1;
+ 143   5                                                      direct[snakelen]=direct[snakelen-1];
+ 144   5                                                      snakelen++;
+ 145   5                                                      error=0;
+ 146   5                                                      situation=2;
+ 147   5                                                      break;
+ 148   5                                              }
+ 149   4                                      }
+ 150   3                                      if (error){
+ 151   4                                              situation=1;
+ 152   4                                      }
+ 153   3                              } 
+ 154   2                              break;
+ 155   2                      default: break;         
+ 156   2              }
+ 157   1              if(situation==0){
+ 158   2                      for(i=0;i<snakelen;i++){
+ 159   3                              switch(direct[i]){
+ 160   4                                      case 1: snakex[i]-=1;break;
+ 161   4                                      case 2: snakex[i]+=1;break;
+ 162   4                                      case 3: snakey[i]-=1;break;
+ 163   4                                      case 4: snakey[i]+=1;break;
+ 164   4                                      default: break;
+ 165   4                              }
+ 166   3                              if(i!=snakelen-1){
+ 167   4                                      direct[i]=direct[i+1];
+ 168   4                              }
+ 169   3                      }
+ 170   2              }else if(situation==2){
+ 171   2                      for(i=0;i<6;i++){
+ 172   3                              if(food[i]==1){
+ 173   4                                      havefood=1;
+ 174   4                                      situation=0;
+ 175   4                                      break;
+ 176   4                              }
+ 177   3                      }
+ 178   2                      if(~havefood){
+ 179   3                              situation=4;
+C51 COMPILER V8.02   GAME                                                                  10/19/2013 18:15:31 PAGE 4   
+
+ 180   3                      }
+ 181   2              }
+ 182   1      }
+ 183          
+ 184          void draw(void){
+ 185   1              unsigned char i;
+ 186   1              first_page();
+ 187   1              if(situation==0){
+ 188   2                      for(i=0;i<snakelen;i++){
+ 189   3                              set_dot(snakex[i],snakey[i]);
+ 190   3                      }
+ 191   2                      for(i=0;i<6;i++){
+ 192   3                              if(food[i]){
+ 193   4                                      set_dot(foodx[i],foody[i]);
+ 194   4                              }
+ 195   3                      }
+ 196   2              }else if(situation==1){
+ 197   2                      for(i=0;i<32;i++){
+ 198   3                              LEDarraydata[i]=die[i];
+ 199   3                      }
+ 200   2              }else if(situation==4){
+ 201   2                      for(i=0;i<32;i++){
+ 202   3                              LEDarraydata[i]=win[i];
+ 203   3                      }
+ 204   2              }
+ 205   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    391    ----
-   CONSTANT SIZE    =     32    ----
-C51 COMPILER V8.02   GAME                                                                  10/19/2013 13:32:26 PAGE 3   
-
+   CODE SIZE        =    992    ----
+   CONSTANT SIZE    =     76    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     21       2
+   DATA SIZE        =     33       3
    IDATA SIZE       =   ----    ----
-   BIT SIZE         =   ----    ----
+   BIT SIZE         =   ----       2
 END OF MODULE INFORMATION.
 
 
