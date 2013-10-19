@@ -13,13 +13,13 @@ void main(){
 
 	SCH_Add_Task(draw1,0,2);
 	SCH_Add_Task(draw2,1,2);
-	SCH_Add_Task(draw,0,33);
+	SCH_Add_Task(draw,0,34);
 
 	SCH_Start();
 	while(1){
 		SCH_Dispatch_Tasks();
 		button();
-		if(400==count++){
+		if(350==count++){
 			count=0;
 			move();
 		}	

@@ -1,4 +1,4 @@
-C51 COMPILER V8.02   MAIN                                                                  10/19/2013 18:15:31 PAGE 1   
+C51 COMPILER V8.02   MAIN                                                                  10/19/2013 18:28:19 PAGE 1   
 
 
 C51 COMPILER V8.02, COMPILATION OF MODULE MAIN
@@ -22,13 +22,13 @@ line level    source
   13   1      
   14   1              SCH_Add_Task(draw1,0,2);
   15   1              SCH_Add_Task(draw2,1,2);
-  16   1              SCH_Add_Task(draw,0,33);
+  16   1              SCH_Add_Task(draw,0,34);
   17   1      
   18   1              SCH_Start();
   19   1              while(1){
   20   2                      SCH_Dispatch_Tasks();
   21   2                      button();
-  22   2                      if(400==count++){
+  22   2                      if(350==count++){
   23   3                              count=0;
   24   3                              move();
   25   3                      }       

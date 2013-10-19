@@ -1,4 +1,4 @@
-C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:15:31 PAGE 1   
+C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:28:19 PAGE 1   
 
 
 C51 COMPILER V8.02, COMPILATION OF MODULE SCH51
@@ -62,7 +62,7 @@ line level    source
   53          static tWord Error_tick_count_G;
   54          
   55          // The code of the last error (reset after ~1 minute)
-C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:15:31 PAGE 2   
+C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:28:19 PAGE 2   
 
   56          static tByte Last_error_code_G;
   57          
@@ -126,7 +126,7 @@ line level    source
  115                     which should help clarify this).
  116          
  117          
-C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:15:31 PAGE 3   
+C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:28:19 PAGE 3   
 
  118            RETURN VALUE:  
  119          
@@ -190,7 +190,7 @@ line level    source
  177          /*------------------------------------------------------------------*-
  178          
  179            SCH_Delete_Task()
-C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:15:31 PAGE 4   
+C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:28:19 PAGE 4   
 
  180          
  181            Removes a task from the scheduler.  Note that this does
@@ -254,7 +254,7 @@ line level    source
  239          void SCH_Report_Status(void)
  240             {
  241   1      #ifdef SCH_REPORT_ERRORS
-C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:15:31 PAGE 5   
+C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:28:19 PAGE 5   
 
                  // ONLY APPLIES IF WE ARE REPORTING ERRORS
                  // Check for a new error code
@@ -318,7 +318,7 @@ line level    source
  301   1         // on 80c515 / 80c505 - to avoid accidental triggering
  302   1         //PCON |= 0x01;    // Enter idle mode (#1)
  303   1         //PCON |= 0x20;    // Enter idle mode (#2)
-C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:15:31 PAGE 6   
+C51 COMPILER V8.02   SCH51                                                                 10/19/2013 18:28:19 PAGE 6   
 
  304   1         }
  305          

@@ -1,4 +1,4 @@
-C51 COMPILER V8.02   2_01_12G                                                              10/19/2013 18:15:31 PAGE 1   
+C51 COMPILER V8.02   2_01_12G                                                              10/19/2013 18:28:19 PAGE 1   
 
 
 C51 COMPILER V8.02, COMPILATION OF MODULE 2_01_12G
@@ -62,7 +62,7 @@ line level    source
   53   1         for (i = 0; i < SCH_MAX_TASKS; i++) 
   54   1            {
   55   2            SCH_Delete_Task(i);
-C51 COMPILER V8.02   2_01_12G                                                              10/19/2013 18:15:31 PAGE 2   
+C51 COMPILER V8.02   2_01_12G                                                              10/19/2013 18:28:19 PAGE 2   
 
   56   2            }
   57   1      
@@ -126,7 +126,7 @@ line level    source
  115             {
  116   1         tByte Index;
  117   1      
-C51 COMPILER V8.02   2_01_12G                                                              10/19/2013 18:15:31 PAGE 3   
+C51 COMPILER V8.02   2_01_12G                                                              10/19/2013 18:28:19 PAGE 3   
 
  118   1         TF2 = 0; // Have to manually clear this. 
  119   1      
