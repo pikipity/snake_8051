@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="贪吃蛇（8051） : 在 16*16 的 LED 点阵上用 8051 玩贪吃蛇" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>贪吃蛇（8051）</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/pikipity/snake_8051">View on GitHub</a>
+
+          <h1 id="project_title">贪吃蛇（8051）</h1>
+          <h2 id="project_tagline">在 16*16 的 LED 点阵上用 8051 玩贪吃蛇</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/pikipity/snake_8051/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/pikipity/snake_8051/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a name="%E7%AE%80%E4%BB%8B" class="anchor" href="#%E7%AE%80%E4%BB%8B"><span class="octicon octicon-link"></span></a>简介</h2>
+
+<p>使用 AT89C52 制作的贪吃蛇游戏。练习在 8051 上使用实时多任务系统。一开始的构想是利用 LCD12864 来作为显示屏，于是选择了自己比较熟悉的 ST7920 作为控制器的 LCD12864，毕竟之前也使用同样的显示屏用 Arduino 做过尔罗斯方块，虽然图像显示处理缓慢，但是应该还是可以使用的，测试之后的结果大失所望，由于过于过于缓慢的图像显示导致屏幕闪烁现象过于严重，并且导致任务堵塞，程序堵死，于是放弃。改而使用 4 块 8*8 LED 矩阵来做显示屏，由于要自己撰写显示函数和游戏函数，程序量徒然增加，还出现了单片机内存不足的现象，经过调试，最终结果还算不错，以下基本功能都已经实现：</p>
+
+<ol>
+<li>蛇和食物的显示。</li>
+<li>蛇的移动，包括碰撞边界和自身之后的死亡判定和碰撞食物的判定。</li>
+<li>蛇在吃掉食物之后的增长效果。</li>
+</ol><p>由于 8051 单片机本身内存与机能的限制，还有很多预想功能未能实现：</p>
+
+<ol>
+<li>食物位置不是随机的，永远固定。</li>
+<li>食物数量固定，就是开始游戏之后的那几个食物，不会再增加了，吃完就获胜。</li>
+<li>蛇的最大长度是固定的。</li>
+<li>蛇的初试长度与位置都不是随机的，永远固定。</li>
+</ol><h2>
+<a name="%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E" class="anchor" href="#%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E"><span class="octicon octicon-link"></span></a>文件说明：</h2>
+
+<ol>
+<li>lcd12864 文件夹中是使用 lcd12864 制作的初版游戏。仅实现了蛇的移动和边界碰撞判定。闪烁现象严重</li>
+<li>LCD_array 文件夹中是最终成品。使用 4 个 8*8 的 LED 点阵来作为显示，4个按钮控制上下左右，还有一个 Reset 键用来重启单片机（也就是重启游戏）。此文件夹中包括以下文件</li>
+</ol><ul>
+<li>
+<p>circuit 文件夹：Proteus 仿真电路图，如下</p>
+
+<p><img src="https://lh5.googleusercontent.com/-lG-RF7FdufE/UmJ34xQ_jUI/AAAAAAAABS8/sQYAz3mA0DA/s720/circuit.jpg" alt="仿真电路图"></p>
+</li>
+<li>
+<p>program 文件夹：烧录入单片机中的程序文档，包括</p>
+
+<ul>
+<li>Main.h, Sch51.h, Sch51.c, 2_01_12g.h, 2_01_12g.c: 实时多任务系统所需的文件，由《PATTERNS FOR TIME-TRIGGERED EMBEDDED SYSTEMS》一书提供。</li>
+<li>main.c: 主程序。main 函数所在。</li>
+<li>ledarray.h, ledarray.c: LED 点阵显示函数：
+
+<ul>
+<li>LED 点阵初始化函数：<code>led_init()</code>
+</li>
+<li>绘制第一块与第二块 LED 点阵的函数：<code>draw1()</code>
+</li>
+<li>绘制第三块与第四块 LED 点阵的函数：<code>draw2()</code>
+</li>
+<li>清空显示的函数：<code>first_page()</code>
+</li>
+<li>向某个坐标写入一个点的函数（左上角为原点，x轴正方向向右延伸，y轴正方向向下延伸，下同）：<code>set_dot()</code>
+</li>
+<li>读取某个坐标是否有点存在的函数：<code>read_dot()</code>
+</li>
+</ul>
+</li>
+<li>game.h, game.c: 游戏控制及显示函数：
+
+<ul>
+<li>根据蛇和食物的控制矩阵，向屏幕内绘制点的函数：<code>draw()</code>
+</li>
+<li>控制蛇移动的函数：<code>move()</code>
+</li>
+<li>检查按键的函数：<code>button()</code>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul><h3>
+<a name="%E6%9C%80%E7%BB%88%E6%95%88%E6%9E%9C" class="anchor" href="#%E6%9C%80%E7%BB%88%E6%95%88%E6%9E%9C"><span class="octicon octicon-link"></span></a>最终效果</h3>
+
+<p>效果可以到观看以下视频：</p>
+
+<ol>
+<li><a href="http://video.sina.com.cn/v/b/117246371-3342829334.html">胜利</a></li>
+<li><a href="http://video.sina.com.cn/v/b/117246399-3342829334.html">失败</a></li>
+</ol>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">贪吃蛇（8051） maintained by <a href="https://github.com/pikipity">pikipity</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-38118079-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
