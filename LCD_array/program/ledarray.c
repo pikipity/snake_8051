@@ -127,6 +127,8 @@ bit read_dot(unsigned char x,unsigned char y){
 		//read
 		rdata=LEDarraydata[arry_row]>>xbit;
 		return rdata&0x01;
+	}else{
+		return 0;
 	}
 }
 

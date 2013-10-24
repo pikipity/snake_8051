@@ -1,4 +1,4 @@
-BL51 BANKED LINKER/LOCATER V6.00                                                        10/19/2013  18:28:19  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.00                                                        10/24/2013  20:34:13  PAGE 1
 
 
 BL51 BANKED LINKER/LOCATER V6.00, INVOKED BY:
@@ -56,15 +56,15 @@ LINK MAP OF MODULE:  snake (SCH51)
             CODE    05D8H     0054H     UNIT         ?PR?BUTTON?GAME
             CODE    062CH     0053H     UNIT         ?PR?SCH_DISPATCH_TASKS?SCH51
             CODE    067FH     0050H     UNIT         ?PR?_SET_DOT?LEDARRAY
-            CODE    06CFH     004CH     UNIT         ?CO?GAME
-            CODE    071BH     004BH     UNIT         ?PR?_READ_DOT?LEDARRAY
-            CODE    0766H     0049H     UNIT         ?PR?_SCH_DELETE_TASK?SCH51
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 2
+            CODE    06CFH     004DH     UNIT         ?PR?_READ_DOT?LEDARRAY
+            CODE    071CH     004CH     UNIT         ?CO?GAME
+            CODE    0768H     0049H     UNIT         ?PR?_SCH_DELETE_TASK?SCH51
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 2
 
 
-            CODE    07AFH     0040H     UNIT         ?PR?DRAW1?LEDARRAY
-            CODE    07EFH     0040H     UNIT         ?PR?DRAW2?LEDARRAY
-            CODE    082FH     002AH     UNIT         ?PR?SCH_INIT_T2?2_01_12G
+            CODE    07B1H     0040H     UNIT         ?PR?DRAW1?LEDARRAY
+            CODE    07F1H     0040H     UNIT         ?PR?DRAW2?LEDARRAY
+            CODE    0831H     002AH     UNIT         ?PR?SCH_INIT_T2?2_01_12G
 
 
 
@@ -119,7 +119,7 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   ----------------------------------
 
   -------         MODULE        SCH51
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 3
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 3
 
 
   C:0000H         SYMBOL        _ICE_DUMMY_
@@ -131,7 +131,7 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   D:007CH         SYMBOL        Last_error_code_G
   D:007DH         SYMBOL        Error_tick_count_G
   C:062CH         PUBLIC        SCH_Dispatch_Tasks
-  C:0766H         PUBLIC        _SCH_Delete_Task
+  C:0768H         PUBLIC        _SCH_Delete_Task
   C:0023H         SYMBOL        SCH_Go_To_Sleep
   -------         PROC          SCH_DISPATCH_TASKS
   -------         DO            
@@ -179,7 +179,7 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   C:0577H         LINE#         172
   C:0581H         LINE#         174
   C:0581H         LINE#         175
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 4
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 4
 
 
   -------         ENDPROC       _SCH_ADD_TASK
@@ -188,22 +188,22 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   -------         DO            
   B:0020H.0       SYMBOL        Return_code
   -------         ENDDO         
-  C:0766H         LINE#         190
-  C:0766H         LINE#         191
-  C:0766H         LINE#         194
-  C:0775H         LINE#         195
-  C:0775H         LINE#         199
-  C:0778H         LINE#         202
-  C:077AH         LINE#         203
-  C:077CH         LINE#         205
-  C:077CH         LINE#         206
-  C:077EH         LINE#         207
-  C:077EH         LINE#         209
-  C:078AH         LINE#         210
-  C:0796H         LINE#         211
-  C:07A2H         LINE#         213
-  C:07ACH         LINE#         215
-  C:07AEH         LINE#         216
+  C:0768H         LINE#         190
+  C:0768H         LINE#         191
+  C:0768H         LINE#         194
+  C:0777H         LINE#         195
+  C:0777H         LINE#         199
+  C:077AH         LINE#         202
+  C:077CH         LINE#         203
+  C:077EH         LINE#         205
+  C:077EH         LINE#         206
+  C:0780H         LINE#         207
+  C:0780H         LINE#         209
+  C:078CH         LINE#         210
+  C:0798H         LINE#         211
+  C:07A4H         LINE#         213
+  C:07AEH         LINE#         215
+  C:07B0H         LINE#         216
   -------         ENDPROC       _SCH_DELETE_TASK
   -------         PROC          SCH_REPORT_STATUS
   C:002AH         LINE#         239
@@ -224,7 +224,7 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   D:00CBH         PUBLIC        RCAP2H
   C:0446H         PUBLIC        SCH_Update
   D:00CAH         PUBLIC        RCAP2L
-  C:082FH         PUBLIC        SCH_Init_T2
+  C:0831H         PUBLIC        SCH_Init_T2
   B:00A8H.5       PUBLIC        ET2
   B:00C8H.7       PUBLIC        TF2
   D:00CDH         PUBLIC        TH2
@@ -237,25 +237,25 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   -------         DO            
   D:000AH         SYMBOL        i
   -------         ENDDO         
-  C:082FH         LINE#         49
-  C:082FH         LINE#         50
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 5
+  C:0831H         LINE#         49
+  C:0831H         LINE#         50
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 5
 
 
-  C:082FH         LINE#         53
-  C:0832H         LINE#         54
-  C:0832H         LINE#         55
-  C:0837H         LINE#         56
-  C:0840H         LINE#         61
-  C:0843H         LINE#         72
-  C:0846H         LINE#         73
-  C:0848H         LINE#         75
-  C:084BH         LINE#         76
-  C:084EH         LINE#         77
-  C:0851H         LINE#         78
-  C:0854H         LINE#         80
-  C:0856H         LINE#         82
-  C:0858H         LINE#         83
+  C:0831H         LINE#         53
+  C:0834H         LINE#         54
+  C:0834H         LINE#         55
+  C:0839H         LINE#         56
+  C:0842H         LINE#         61
+  C:0845H         LINE#         72
+  C:0848H         LINE#         73
+  C:084AH         LINE#         75
+  C:084DH         LINE#         76
+  C:0850H         LINE#         77
+  C:0853H         LINE#         78
+  C:0856H         LINE#         80
+  C:0858H         LINE#         82
+  C:085AH         LINE#         83
   -------         ENDPROC       SCH_INIT_T2
   -------         PROC          SCH_START
   C:0027H         LINE#         98
@@ -299,7 +299,7 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   C:0582H         LINE#         9
   C:0582H         LINE#         10
   C:0585H         LINE#         12
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 6
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 6
 
 
   C:0588H         LINE#         14
@@ -326,14 +326,14 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   D:00A8H         PUBLIC        IE
   D:0025H         PUBLIC        LEDarraydata
   D:00B8H         PUBLIC        IP
-  C:071BH         PUBLIC        _read_dot
+  C:06CFH         PUBLIC        _read_dot
   C:0013H         PUBLIC        first_page
   D:0098H         PUBLIC        SCON
   D:0088H         PUBLIC        TCON
   C:0003H         PUBLIC        led_init
   C:067FH         PUBLIC        _set_dot
-  C:07AFH         PUBLIC        draw1
-  C:07EFH         PUBLIC        draw2
+  C:07B1H         PUBLIC        draw1
+  C:07F1H         PUBLIC        draw2
   D:00C8H         PUBLIC        T2CON
   B:00B0H.0       PUBLIC        E1
   B:00B0H.1       PUBLIC        E2
@@ -356,53 +356,53 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   D:0021H         SYMBOL        i1
   D:0022H         SYMBOL        k1
   -------         ENDDO         
-  C:07AFH         LINE#         51
-  C:07AFH         LINE#         54
-  C:07B1H         LINE#         55
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 7
+  C:07B1H         LINE#         51
+  C:07B1H         LINE#         54
+  C:07B3H         LINE#         55
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 7
 
 
-  C:07B3H         LINE#         56
-  C:07B8H         LINE#         57
-  C:07BAH         LINE#         58
-  C:07BCH         LINE#         59
-  C:07BFH         LINE#         60
-  C:07C1H         LINE#         61
-  C:07C3H         LINE#         62
-  C:07C5H         LINE#         63
-  C:07C7H         LINE#         64
-  C:07D0H         LINE#         65
-  C:07D8H         LINE#         67
-  C:07D8H         LINE#         68
-  C:07E0H         LINE#         69
-  C:07E3H         LINE#         70
-  C:07EEH         LINE#         71
-  C:07EEH         LINE#         72
+  C:07B5H         LINE#         56
+  C:07BAH         LINE#         57
+  C:07BCH         LINE#         58
+  C:07BEH         LINE#         59
+  C:07C1H         LINE#         60
+  C:07C3H         LINE#         61
+  C:07C5H         LINE#         62
+  C:07C7H         LINE#         63
+  C:07C9H         LINE#         64
+  C:07D2H         LINE#         65
+  C:07DAH         LINE#         67
+  C:07DAH         LINE#         68
+  C:07E2H         LINE#         69
+  C:07E5H         LINE#         70
+  C:07F0H         LINE#         71
+  C:07F0H         LINE#         72
   -------         ENDPROC       DRAW1
   -------         PROC          DRAW2
   -------         DO            
   D:0023H         SYMBOL        i2
   D:0024H         SYMBOL        k2
   -------         ENDDO         
-  C:07EFH         LINE#         74
-  C:07EFH         LINE#         77
-  C:07F1H         LINE#         78
-  C:07F3H         LINE#         79
-  C:07F8H         LINE#         80
-  C:07FAH         LINE#         81
-  C:07FCH         LINE#         82
-  C:07FFH         LINE#         83
-  C:0801H         LINE#         84
-  C:0803H         LINE#         85
-  C:0805H         LINE#         86
-  C:0807H         LINE#         87
-  C:0810H         LINE#         88
-  C:0818H         LINE#         89
-  C:0818H         LINE#         90
-  C:0820H         LINE#         91
-  C:0823H         LINE#         92
-  C:082EH         LINE#         93
-  C:082EH         LINE#         95
+  C:07F1H         LINE#         74
+  C:07F1H         LINE#         77
+  C:07F3H         LINE#         78
+  C:07F5H         LINE#         79
+  C:07FAH         LINE#         80
+  C:07FCH         LINE#         81
+  C:07FEH         LINE#         82
+  C:0801H         LINE#         83
+  C:0803H         LINE#         84
+  C:0805H         LINE#         85
+  C:0807H         LINE#         86
+  C:0809H         LINE#         87
+  C:0812H         LINE#         88
+  C:081AH         LINE#         89
+  C:081AH         LINE#         90
+  C:0822H         LINE#         91
+  C:0825H         LINE#         92
+  C:0830H         LINE#         93
+  C:0830H         LINE#         95
   -------         ENDPROC       DRAW2
   -------         PROC          _SET_DOT
   D:0007H         SYMBOL        x
@@ -419,7 +419,7 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   C:067FH         LINE#         97
   C:067FH         LINE#         99
   C:069BH         LINE#         100
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 8
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 8
 
 
   C:06A2H         LINE#         101
@@ -444,28 +444,30 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   D:0006H         SYMBOL        xbyte
   D:0007H         SYMBOL        rdata
   -------         ENDDO         
-  C:071BH         LINE#         115
-  C:071BH         LINE#         118
-  C:0737H         LINE#         119
-  C:073EH         LINE#         120
-  C:0742H         LINE#         121
-  C:0749H         LINE#         122
-  C:074DH         LINE#         124
-  C:0751H         LINE#         126
-  C:0756H         LINE#         128
-  C:0764H         LINE#         129
-  C:0765H         LINE#         130
-  C:0765H         LINE#         131
+  C:06CFH         LINE#         115
+  C:06CFH         LINE#         118
+  C:06EBH         LINE#         119
+  C:06F2H         LINE#         120
+  C:06F6H         LINE#         121
+  C:06FDH         LINE#         122
+  C:0701H         LINE#         124
+  C:0705H         LINE#         126
+  C:070AH         LINE#         128
+  C:0718H         LINE#         129
+  C:071AH         LINE#         130
+  C:071AH         LINE#         131
+  C:071BH         LINE#         132
+  C:071BH         LINE#         133
   -------         ENDPROC       _READ_DOT
   -------         PROC          FIRST_PAGE
   -------         DO            
   D:0007H         SYMBOL        i
   -------         ENDDO         
-  C:0013H         LINE#         133
   C:0013H         LINE#         135
-  C:0013H         LINE#         136
-  C:001CH         LINE#         137
-  C:001CH         LINE#         138
+  C:0013H         LINE#         137
+  C:0013H         LINE#         138
+  C:001CH         LINE#         139
+  C:001CH         LINE#         140
   -------         ENDPROC       FIRST_PAGE
   -------         ENDMOD        LEDARRAY
 
@@ -477,24 +479,24 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   B:00B0H.5       PUBLIC        rightb
   D:004DH         SYMBOL        snakex
   D:00A8H         PUBLIC        IE
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 9
+
+
   D:0055H         SYMBOL        snakey
   B:00B0H.4       PUBLIC        leftb
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 9
-
-
   D:00B8H         PUBLIC        IP
   B:00B0H.7       PUBLIC        downb
   C:05D8H         PUBLIC        button
-  C:070FH         PUBLIC        foodx
-  C:0715H         PUBLIC        foody
+  C:075CH         PUBLIC        foodx
+  C:0762H         PUBLIC        foody
   D:005DH         PUBLIC        food
   C:03BCH         PUBLIC        draw
-  C:06CFH         PUBLIC        die
+  C:071CH         PUBLIC        die
   D:0098H         PUBLIC        SCON
   D:0088H         PUBLIC        TCON
   C:002EH         PUBLIC        move
   B:00B0H.6       PUBLIC        upb
-  C:06EFH         PUBLIC        win
+  C:073CH         PUBLIC        win
   D:0063H         SYMBOL        snakelen
   D:0065H         SYMBOL        situation
   D:00C8H         PUBLIC        T2CON
@@ -537,11 +539,11 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   C:005EH         LINE#         73
   C:005EH         LINE#         74
   C:0073H         LINE#         75
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 10
+
+
   C:0076H         LINE#         76
   C:0097H         LINE#         77
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 10
-
-
   C:009EH         LINE#         78
   C:00AEH         LINE#         79
   C:00BBH         LINE#         80
@@ -597,11 +599,11 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   C:0210H         LINE#         130
   C:0210H         LINE#         131
   C:0210H         LINE#         132
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 11
+
+
   C:0210H         LINE#         133
   C:0213H         LINE#         134
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 11
-
-
   C:0213H         LINE#         135
   C:021DH         LINE#         136
   C:021DH         LINE#         137
@@ -657,11 +659,11 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   -------         ENDDO         
   C:03BCH         LINE#         184
   C:03BCH         LINE#         186
+BL51 BANKED LINKER/LOCATER V6.00                                                      10/24/2013  20:34:13  PAGE 12
+
+
   C:03BFH         LINE#         187
   C:03C3H         LINE#         188
-BL51 BANKED LINKER/LOCATER V6.00                                                      10/19/2013  18:28:19  PAGE 12
-
-
   C:03CFH         LINE#         189
   C:03E0H         LINE#         190
   C:03E4H         LINE#         191
@@ -687,5 +689,5 @@ SYMBOL TABLE OF MODULE:  snake (SCH51)
   C:0021H         PUBLIC        ?C?ICALL2
   -------         ENDMOD        ?C?ICALL
 
-Program Size: data=107.2 xdata=0 code=2137
+Program Size: data=107.2 xdata=0 code=2139
 LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

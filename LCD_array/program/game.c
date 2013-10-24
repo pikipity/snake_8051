@@ -176,7 +176,7 @@ void move(void){
 			}
 		}
 		if(~havefood){
-			situation=4;
+			situation=3;
 		}
 	}
 }
@@ -197,7 +197,7 @@ void draw(void){
 		for(i=0;i<32;i++){
 			LEDarraydata[i]=die[i];
 		}
-	}else if(situation==4){
+	}else if(situation==3){
 		for(i=0;i<32;i++){
 			LEDarraydata[i]=win[i];
 		}
