@@ -1,4 +1,4 @@
-C51 COMPILER V8.02   LEDARRAY                                                              10/24/2013 20:34:13 PAGE 1   
+C51 COMPILER V8.02   LEDARRAY                                                              10/25/2013 20:33:23 PAGE 1   
 
 
 C51 COMPILER V8.02, COMPILATION OF MODULE LEDARRAY
@@ -62,7 +62,7 @@ line level    source
   53   1                      static unsigned char k1=0;
   54   1                      E3=0;
   55   1                      E4=0;
-C51 COMPILER V8.02   LEDARRAY                                                              10/24/2013 20:34:13 PAGE 2   
+C51 COMPILER V8.02   LEDARRAY                                                              10/25/2013 20:33:23 PAGE 2   
 
   56   1                      if(i1==1){
   57   2                              E2=0;
@@ -126,7 +126,7 @@ line level    source
  115          bit read_dot(unsigned char x,unsigned char y){
  116   1              unsigned char xbit,ybit,screen,arry_row,ybyte,xbyte;
  117   1              unsigned char rdata;
-C51 COMPILER V8.02   LEDARRAY                                                              10/24/2013 20:34:13 PAGE 3   
+C51 COMPILER V8.02   LEDARRAY                                                              10/25/2013 20:33:23 PAGE 3   
 
  118   1              if(x<16 & y<16){
  119   2                      xbyte=x/8;

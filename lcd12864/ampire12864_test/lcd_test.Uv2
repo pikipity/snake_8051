@@ -5,11 +5,7 @@ Target (Target 1), 0x0000 // Tools: 'MCS-51'
 
 Group (Source Group 1)
 
-File 1,1,<.\snake.c><snake.c> 0x0 
-File 1,1,<.\lcd12864.c><lcd12864.c> 0x0 
-File 1,1,<.\2_01_12g.c><2_01_12g.c> 0x0 
-File 1,1,<.\Sch51.c><Sch51.c> 0x0 
-File 1,1,<.\game.c><game.c> 0x0 
+File 1,1,<.\lcd_test.c><lcd_test.c> 0x0 
 
 
 Options 1,0,0  // Target 'Target 1'
@@ -38,7 +34,7 @@ Options 1,0,0  // Target 'Target 1'
  OrgReg (ÿAtmel\)
  TgStat=16
  OutDir (.\)
- OutName (snake)
+ OutName (lcd_test)
  GenApp=1
  GenLib=0
  GenHex=1
@@ -62,7 +58,7 @@ Options 1,0,0  // Target 'Target 1'
  XT51FL=0
  CBANKS5=0
  XBANKS5=0
- RCB51 { 0,0,0,0,0,255,255,0,0 }
+ RCB51 { 0,0,0,0,0,0,0,1,0 }
  RXB51 { 0,0,0,0,0,0,0,0,0 }
  OCM51 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
  OCR51 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }

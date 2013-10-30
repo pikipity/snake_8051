@@ -1,9 +1,9 @@
-C51 COMPILER V8.02   2_01_12G                                                              10/17/2013 23:53:58 PAGE 1   
+C51 COMPILER V8.02   2_01_12G                                                              10/30/2013 22:03:21 PAGE 1   
 
 
 C51 COMPILER V8.02, COMPILATION OF MODULE 2_01_12G
 OBJECT MODULE PLACED IN 2_01_12g.OBJ
-COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE 2_01_12g.c OMF2 BROWSE DEBUG
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE 2_01_12g.c BROWSE DEBUG OBJECTEXTEND
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   53   1         for (i = 0; i < SCH_MAX_TASKS; i++) 
   54   1            {
   55   2            SCH_Delete_Task(i);
-C51 COMPILER V8.02   2_01_12G                                                              10/17/2013 23:53:58 PAGE 2   
+C51 COMPILER V8.02   2_01_12G                                                              10/30/2013 22:03:21 PAGE 2   
 
   56   2            }
   57   1      
@@ -126,7 +126,7 @@ line level    source
  115             {
  116   1         tByte Index;
  117   1      
-C51 COMPILER V8.02   2_01_12G                                                              10/17/2013 23:53:58 PAGE 3   
+C51 COMPILER V8.02   2_01_12G                                                              10/30/2013 22:03:21 PAGE 3   
 
  118   1         TF2 = 0; // Have to manually clear this. 
  119   1      
@@ -164,17 +164,13 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    173    ----
+   CODE SIZE        =    170    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----       1
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
-   EDATA SIZE       =   ----    ----
-   HDATA SIZE       =   ----    ----
-   XDATA CONST SIZE =   ----    ----
-   FAR CONST SIZE   =   ----    ----
 END OF MODULE INFORMATION.
 
 

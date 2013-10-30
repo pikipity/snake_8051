@@ -12,10 +12,21 @@ sbit rightb=P3^1;
 sbit upb=P3^2;
 sbit downb=P3^3;
 
-unsigned char code finish_string[]={"×²Ç½¶øËÀ"};
+//unsigned char code finish_string[]={"×²Ç½¶øËÀ"};
 
-void game_init(void){
-	draw_line(snakex[0],snakey[0],snakex[4],snakey[4]);
+void draw(void){
+	unsigned char dotnum=0;
+	first_page();
+	if(situation==0){
+		while(dotnum<snakelen){
+			dotnum++;
+			set_dot(snakex[dotnum],snakey[dotnum]);
+		}
+	}else if(situation==1){
+		//display_string(2,2,finish_string);
+		while(1);
+	}
+	
 }
 
 void button(void){
@@ -44,12 +55,12 @@ void move(void){
 	i=snakelen;
 	switch(direct[i-1]){
 		case 1: 
-			if(snakex[i-1]==127){
+			if(snakex[i-1]==0){
 				situation=1;
 			} 
 			break;
 		case 2: 
-			if(snakex[i-1]==0){
+			if(snakex[i-1]==127){
 				situation=1;
 			} 
 			break;
@@ -82,15 +93,8 @@ void move(void){
 	}
 }
 
-void draw(void){
-	unsigned char i;
-	first_page();
-	if(situation==0){
-		for(i=0;i<snakelen;i++){
-			set_dot(snakex[i],snakey[i]);
-		}
-	}else if(situation==1){
-		display_string(2,2,finish_string);
-		while(1);
-	}
+void rungame(){
+	P1=~P1;
+	move();
+	draw();
 }

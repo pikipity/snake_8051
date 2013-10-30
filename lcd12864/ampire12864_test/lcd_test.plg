@@ -1,0 +1,25 @@
+<html>
+<body>
+<pre>
+<h1>µVision3 Build Log</h1>
+<h2>Project:</h2>
+C:\Documents and Settings\Administrator\My Documents\GitHub\snake_8051\lcd12864\ampire12864_test\lcd_test.uv2
+Project File Date:  10/30/2013
+
+<h2>Output:</h2>
+Build target 'Target 1'
+compiling lcd_test.c...
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?READ_DATA?LCD_TEST
+Program Size: data=13.0 xdata=0 code=352
+creating hex file from "lcd_test"...
+"lcd_test" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+compiling lcd_test.c...
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?READ_DATA?LCD_TEST
+Program Size: data=13.0 xdata=0 code=352
+creating hex file from "lcd_test"...
+"lcd_test" - 0 Error(s), 1 Warning(s).

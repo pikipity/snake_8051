@@ -1,794 +1,148 @@
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 1   
+C51 COMPILER V8.02   LCD12864                                                              10/30/2013 22:03:21 PAGE 1   
 
 
 C51 COMPILER V8.02, COMPILATION OF MODULE LCD12864
 OBJECT MODULE PLACED IN lcd12864.OBJ
-COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE lcd12864.c OMF2 BROWSE DEBUG
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE lcd12864.c BROWSE DEBUG OBJECTEXTEND
 
 line level    source
 
    1          #include <reg52.h>
    2          #include <string.h>
-   3          #include "lcd12864.h"
-   4          
-   5          void delayus(unsigned int t)
-   6          {
-   7   1              while(--t);
-   8   1      
-   9   1      }
-  10          
-  11          void lcd_write_command(unsigned char command){
-  12   1              EN=0;
-  13   1              RS=0;
-  14   1              RW=0;
-  15   1              delayus(1);
-  16   1              P0=command;
-  17   1              EN=1;
-  18   1              delayus(10); 
-  19   1              EN=0;
-  20   1              delayus(1);
+   3          #include <intrins.h>
+   4          #include "lcd12864.h"
+   5          
+   6          void delay(){
+   7   1              _nop_();
+   8   1      }
+   9          
+  10          void choose_screen(unsigned char screen){
+  11   1              if(screen==0){//all screen
+  12   2                      CS1=0;
+  13   2                      CS2=0;
+  14   2              }else if(screen==1){//left screen
+  15   2                      CS1=0;
+  16   2                      CS2=1;
+  17   2              }else if(screen==2){//right screen
+  18   2                      CS1=1;
+  19   2                      CS2=0;
+  20   2              }
   21   1      }
   22          
-  23          void lcd_write_data(unsigned char RWdata){
-  24   1              EN=0;
-  25   1              RS=1;
-  26   1              RW=0;
-  27   1              delayus(1);
-  28   1              P0=RWdata;
-  29   1              EN=1;
-  30   1              delayus(10);
-  31   1              EN=0;
-  32   1              delayus(1);
-  33   1      }
-  34          
-  35          unsigned char lcd_read_data(void){
-  36   1              unsigned char Tempdata;
-  37   1              P0=0xFF;
+  23          void check_busy(){
+  24   1              unsigned char count;
+  25   1              RW=1;
+  26   1              RS=0;
+  27   1              EN=0;
+  28   1              while(1){
+  29   2                      EN=1;
+  30   2                      if(!(lcddata&0x80)){
+  31   3                              break;
+  32   3                      }
+  33   2                      EN=0;
+  34   2                      if(count++>10){
+  35   3                              break;
+  36   3                      }
+  37   2              }
   38   1              EN=0;
-  39   1              RS=1;
-  40   1              RW=1;
-  41   1              delayus(1);
-  42   1              EN=1;
-  43   1              delayus(10);
-  44   1              Tempdata=P0;
+  39   1      }
+  40          
+  41          void lcd_write_command(unsigned char command){
+  42   1              check_busy();
+  43   1              RS=0;
+  44   1              RW=0;
   45   1              EN=0;
-  46   1              return Tempdata;
-  47   1      }
-  48          
-  49          void lcd_init(void){
-  50   1              lcd_write_command(LCDb_BASCMD);//功能设置，一次送8位数据，基本指令集
-  51   1              lcd_write_command(LCDb_ON);//整体显示，游标off，游标位置off
-  52   1              lcd_write_command(LCDb_CLS);//清DDRAM   清屏
-  53   1              lcd_write_command(LCDb_HOME);//DDRAM地址归位
-  54   1              //lcd_write_command(0x80);//设定DDRAM 7位地址000，0000到地址计数器AC//     
-  55   1              lcd_write_command(CurserRight);//点设定，显示字符/光标从左到右移位，DDRAM地址加 一//   
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 2   
+  46   1              lcddata=command;
+  47   1              EN=1;
+  48   1              delay();
+  49   1              EN=0;
+  50   1      }
+  51          
+  52          void lcd_write_data(unsigned char rdata){
+  53   1              check_busy();
+  54   1              RS=1;
+  55   1              RW=0;
+C51 COMPILER V8.02   LCD12864                                                              10/30/2013 22:03:21 PAGE 2   
 
-  56   1              //lcd_write_command(0x0C);//显示设定，开显示，显示光标，当前显示位反白闪动
-  57   1              lcd_write_command(LCDb_CLS);//清屏         */
-  58   1      }
-  59          
-  60          void first_page(void){
-  61   1              unsigned char i,j;
-  62   1              lcd_write_command(LCDb_EXTCMD2);
-  63   1              for(i=0;i<16;i++){
-  64   2                      for(j=0;j<32;j++){
-  65   3                              lcd_write_command(0x80|j);
-  66   3                              lcd_write_command(i|0x80);
-  67   3                              lcd_write_data(0x00);
-  68   3                              lcd_write_data(0x00);   
-  69   3                      }
-  70   2              }
-  71   1              lcd_write_command(LCDb_BASCMD);
-  72   1      }
-  73          
-  74          
-  75          void display_string(unsigned char line,unsigned char space,unsigned char *string){
-  76   1              unsigned char  addr,i;
-  77   1              unsigned char  maxnum=strlen(string);
-  78   1          if(line==1)
-  79   1            addr=0x80;
-  80   1          else if(line==2)
-  81   1            addr=0x90;
-  82   1          else if(line==3)
-  83   1            addr=0x88;
-  84   1          else if(line==4)
-  85   1                      addr=0x98;
-  86   1              addr+=space;
-  87   1          lcd_write_command(addr);
-  88   1          for(i=0;i<maxnum;i++)
-  89   1          {
-  90   2                      lcd_write_data(*string++);
-  91   2              } 
-  92   1      }
-  93          
-  94          void set_dot(unsigned char x,unsigned char y){
-  95   1              if(x>=0 && x<=127 && y>=0 && y<=63){
-  96   2              //initial variables
-  97   2              unsigned int k=0x8000;
-  98   2              unsigned char highdata,lowdata;
-  99   2              //Open external command and graphic display
- 100   2              lcd_write_command(LCDb_EXTCMD2);
- 101   2              //According to y, adjust x and y
- 102   2              if(y>=32){
- 103   3                      y=y-32;
- 104   3                      x=x+128;
- 105   3              }
- 106   2              //according to x, get which bit will be setted.
- 107   2              k=k>>x%16;
- 108   2              //write x and y to prepare to read data
- 109   2              lcd_write_command(0x80|y);
- 110   2              lcd_write_command((x/16)|0x80);
- 111   2              //read exist data and change them to new data.
- 112   2              highdata=lcd_read_data();
- 113   2              highdata=lcd_read_data()|k>>8;
- 114   2              lowdata=lcd_read_data()|k;
- 115   2              //write x and y to prepare to write data
- 116   2              lcd_write_command(0x80|y);
- 117   2              lcd_write_command((x/16)|0x80);
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 3   
+  56   1              EN=0;
+  57   1              lcddata=rdata;
+  58   1              EN=1;
+  59   1              delay();
+  60   1              EN=0;
+  61   1      }
+  62          
+  63          void lcd_init(void){
+  64   1              lcd_write_command(0x3f);
+  65   1              lcd_write_command(0xc0);
+  66   1              lcd_write_command(0xb8);
+  67   1              lcd_write_command(0x40);
+  68   1      }
+  69          
+  70          void first_page(void){
+  71   1              unsigned char x,y;
+  72   1              choose_screen(0);
+  73   1              for(x=0xb8;x<0xc0;x++){
+  74   2                      lcd_write_command(x);
+  75   2                      lcd_write_command(0x40);
+  76   2                      for(y=0;y<64;y++){
+  77   3                              lcd_write_data(0);
+  78   3                      }
+  79   2              }
+  80   1      }
+  81          
+  82          unsigned char lcd_read_data(){
+  83   1              unsigned char rdata;
+  84   1              check_busy();
+  85   1              RS=1;
+  86   1              RW=1;
+  87   1              lcddata=0xFF;
+  88   1              EN=1;
+  89   1              rdata=lcddata;
+  90   1              EN=0;
+  91   1              check_busy();
+  92   1              RS=1;
+  93   1              RW=1;
+  94   1              lcddata=0xFF;
+  95   1              EN=1;
+  96   1              rdata=lcddata;
+  97   1              EN=0;
+  98   1              return rdata;
+  99   1      }
+ 100          
+ 101          void set_dot(unsigned char x,unsigned char y){
+ 102   1              unsigned char ybyte,rdata,xbit,ybit;
+ 103   1              if(x<128 && y<64){
+ 104   2              //choose screen
+ 105   2              choose_screen(x/64+1);
+ 106   2              //adjust x
+ 107   2              xbit=x%64;
+ 108   2              //choose row
+ 109   2              ybyte=y/8;
+ 110   2              //choose bit
+ 111   2              ybit=y%8;
+ 112   2              //read data and get rdata
+ 113   2              lcd_write_command(0xb8|ybyte);
+ 114   2              lcd_write_command(0x40|xbit);
+ 115   2              rdata=lcd_read_data();
+ 116   2              rdata=rdata|(0x01<<ybit);
+ 117   2              //write data
+C51 COMPILER V8.02   LCD12864                                                              10/30/2013 22:03:21 PAGE 3   
 
- 118   2              //write data
- 119   2              lcd_write_data(highdata);
- 120   2              lcd_write_data(lowdata);
- 121   2              //display
- 122   2              //lcd_write_command(LCDb_EXTCMD2);
- 123   2              //go back to basic command
- 124   2              lcd_write_command(LCDb_BASCMD);
- 125   2              }
- 126   1      }
- 127          
- 128          void clear_dot(unsigned char x,unsigned char y){
- 129   1              if(x>=0 && x<=127 && y>=0 && y<=63){
- 130   2              //initial variables
- 131   2              unsigned int k=0x7FFF;
- 132   2              unsigned char highdata,lowdata;
- 133   2              //Open external command and graphic display
- 134   2              lcd_write_command(LCDb_EXTCMD2);
- 135   2              //According to y, adjust x and y
- 136   2              if(y>=32){
- 137   3                      y=y-32;
- 138   3                      x=x+128;
- 139   3              }
- 140   2              //according to x, get which bit will be setted.
- 141   2              k=k>>x%16;
- 142   2              //write x and y to prepare to read data
- 143   2              lcd_write_command(0x80|y);
- 144   2              lcd_write_command((x/16)|0x80);
- 145   2              //read exist data and change them to new data.
- 146   2              highdata=lcd_read_data();
- 147   2              highdata=lcd_read_data()&k>>8;
- 148   2              lowdata=lcd_read_data()&k;
- 149   2              //write x and y to prepare to write data
- 150   2              lcd_write_command(0x80|y);
- 151   2              lcd_write_command((x/16)|0x80);
- 152   2              //write data
- 153   2              lcd_write_data(highdata);
- 154   2              lcd_write_data(lowdata);
- 155   2              //display
- 156   2              //lcd_write_command(LCDb_EXTCMD2);
- 157   2              //go back to basic command
- 158   2              lcd_write_command(LCDb_BASCMD);
- 159   2              }
- 160   1      }
- 161          
- 162          void draw_line(unsigned char x1,unsigned char y1,unsigned char x2,unsigned char y2){    
- 163   1              char dx,dy;//Difference between x1 and x2 and difference between y1 and y2
- 164   1              unsigned char x,y,temp;//x,y: location of pixel.  temp: temp value for exchange of x and y
- 165   1              int e;//adjust whether should be increased
- 166   1              bit k,j;//k: upper slope flag.  j: negative slope flag
- 167   1              dx=x2-x1;
- 168   1              dy=y2-y1;
- 169   1              //if the line is not from high to low, change it.
- 170   1              if((dx<=0 && dy<=0) || (dx>=0 && dy<=0)){
- 171   2                      temp=x2;
- 172   2                      x2=x1;
- 173   2                      x1=temp;
- 174   2                      temp=y2;
- 175   2                      y2=y1;
- 176   2                      y1=temp;
- 177   2                      dx=x2-x1;
- 178   2                      dy=y2-y1;
- 179   2              }
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 4   
-
- 180   1              //if negative slope, change to positive and get flag
- 181   1              if(dx<0){
- 182   2                      temp=x2;
- 183   2                      x2=x1;
- 184   2                      x1=temp;
- 185   2                      dx=x2-x1;
- 186   2                      j=1;
- 187   2              }else{
- 188   2                      j=0;
- 189   2              }
- 190   1              //if upper slope, get flag
- 191   1              if(dx>=dy){
- 192   2                      k=1;    
- 193   2              }else{
- 194   2                      k=0;
- 195   2              }
- 196   1              //Different slope, different default e
- 197   1              if(k){
- 198   2                      e=-dx;
- 199   2              }else{
- 200   2                      e=-dy;
- 201   2              }
- 202   1              //first point
- 203   1              x=x1;
- 204   1              y=y1;
- 205   1              //if has been finished final point, finish drawing.
- 206   1              while(x<=x2 && y<=y2){
- 207   2                      //if the original slope is negative slope, should  change points back
- 208   2                      if(j){
- 209   3                              set_dot(x1+x2-x,y);
- 210   3                      }else{
- 211   3                              set_dot(x,y);
- 212   3                      }
- 213   2                      //different slope, different change of e
- 214   2                      if(k){
- 215   3                              e=e+2*dy;
- 216   3                      }else{
- 217   3                              e=e+2*dx;
- 218   3                      }
- 219   2                      //according to e, adjust whether should go upper
- 220   2                      if(e<=0){
- 221   3                              //different slope, different way to go upper
- 222   3                              if(k){
- 223   4                                      x++;
- 224   4                              }else{
- 225   4                                      y++;
- 226   4                              }
- 227   3                      }else{
- 228   3                              x++;
- 229   3                              y++;
- 230   3                              //different slope, different change of e
- 231   3                              if(k){
- 232   4                                      e=e-2*dx;
- 233   4                              }else{
- 234   4                                      e=e-2*dy;
- 235   4                              }
- 236   3                      }
- 237   2              }
- 238   1      }
- 239          
- 240          void draw_box(unsigned char x,unsigned char y,unsigned char num_x,unsigned char num_y,bit fill){
- 241   1              //x: right upper coner x
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 5   
-
- 242   1              //y: right upper coner y
- 243   1              //num_x: number of pixels in x
- 244   1              //num_y: number os pixels in y
- 245   1              //fill: fill or not
- 246   1              if(fill){
- 247   2                      unsigned char i;
- 248   2                      for(i=y;i<y+num_y;i++){
- 249   3                              draw_line(x,i,x+num_x-1,i);
- 250   3                      }
- 251   2              }else{
- 252   2                      draw_line(x,y,x,y+num_y-1);
- 253   2                      draw_line(x,y,x+num_x-1,y);
- 254   2                      draw_line(x+num_x-1,y+num_y-1,x+num_x-1,y);
- 255   2                      draw_line(x+num_x-1,y+num_y-1,x,y+num_y-1);
- 256   2              }
- 257   1      }
- 258          
- 259          void draw_frame(void){
- 260   1              draw_box(0,0,128,64,0);
- 261   1      }
- 262          
- 263          void draw_circle(unsigned char x,unsigned char y,unsigned char r,bit fill){
- 264   1              //x: x of center
- 265   1              //y: y of center
- 266   1              //r: radius (number of pixels in radius)
- 267   1              //fill: fill or not
- 268   1              unsigned char a,b;
- 269   1              char d;
- 270   1              unsigned char i;
- 271   1              //initial first point
- 272   1              a=0;
- 273   1              b=r-1;
- 274   1              //initial distance
- 275   1              d=1-r;
- 276   1              while(a<=b){//Adjust if circle has been finished
- 277   2                      //draw circle using a point of 1/8 circle to draw 8 points in all circle
- 278   2                      if(fill){
- 279   3                              for(i=a+x;i>=x-a;i--){
- 280   4                                      set_dot(i,b+y);
- 281   4                                      set_dot(i,y-b);
- 282   4                              }
- 283   3                              for(i=b+x;i>=x-b;i--){
- 284   4                                      set_dot(i,a+y);
- 285   4                                      set_dot(i,y-a);
- 286   4                              }
- 287   3                      }else{
- 288   3                              set_dot(a+x,b+y);
- 289   3                              set_dot(a+x,y-b);
- 290   3                              set_dot(x-a,b+y);
- 291   3                              set_dot(x-a,y-b);
- 292   3                              set_dot(b+x,a+y);
- 293   3                              set_dot(b+x,y-a);
- 294   3                              set_dot(x-b,a+y);
- 295   3                              set_dot(x-b,y-a);       
- 296   3                      }
- 297   2                      //use distance to adjust next point.
- 298   2                      if(d<0){
- 299   3                              d+=2*a+3;
- 300   3                      }else{
- 301   3                              d+=2*(a-b)+5;
- 302   3                              b--;
- 303   3                      }
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 6   
-
- 304   2                      a++;
- 305   2              }
- 306   1      }
- 307          
- 308          void draw_8bits(unsigned char x,unsigned char y,unsigned char data8bit){
- 309   1              unsigned char i=8;
- 310   1              bit dot;
- 311   1              while(i>0){
- 312   2                      i--;
- 313   2                      dot=0x01&(data8bit>>i);
- 314   2                      if(dot){
- 315   3                              set_dot(x,y);
- 316   3                      }
- 317   2                      x++;
- 318   2              }
- 319   1      }
- 320          
- 321          void draw_8bits90(unsigned char x,unsigned char y,unsigned char data8bit){
- 322   1              unsigned char i=8;
- 323   1              bit dot;
- 324   1              while(i>0){
- 325   2                      i--;
- 326   2                      dot=0x01&(data8bit>>i);
- 327   2                      if(dot){
- 328   3                              set_dot(x,y);
- 329   3                      }
- 330   2                      y++;
- 331   2              }
- 332   1      }
- 333          
- 334          void draw_8bits180(unsigned char x,unsigned char y,unsigned char data8bit){
- 335   1              unsigned char i=8;
- 336   1              bit dot;
- 337   1              while(i>0){
- 338   2                      i--;
- 339   2                      dot=0x01&(data8bit>>i);
- 340   2                      if(dot){
- 341   3                              set_dot(x,y);
- 342   3                      }
- 343   2                      x--;
- 344   2              }
- 345   1      }
- 346          
- 347          void draw_8bits270(unsigned char x,unsigned char y,unsigned char data8bit){
- 348   1              unsigned char i=8;
- 349   1              bit dot;
- 350   1              while(i>0){
- 351   2                      i--;
- 352   2                      dot=0x01&(data8bit>>i);
- 353   2                      if(dot){
- 354   3                              set_dot(x,y);
- 355   3                      }
- 356   2                      y--;
- 357   2              }
- 358   1      }
- 359          
- 360          void draw_picture(unsigned char x,unsigned char y,unsigned char x_l,unsigned char y_l,unsigned char *pictu
-             -re){
- 361   1              //x_l and y_l must be multiples of 8. They are the picture's length(in x of original system) and width(in
-             - y of original system).
- 362   1              unsigned char i=0;
- 363   1              unsigned char j=0;
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 7   
-
- 364   1              int num=0;
- 365   1              x_l=x_l/8;
- 366   1              while(j<y_l){
- 367   2                      j++;
- 368   2                      while(i<x_l){
- 369   3                              i++;
- 370   3                              draw_8bits(x,y,picture[num]);
- 371   3                              num++;
- 372   3                              x+=8;
- 373   3      
- 374   3                      }
- 375   2                      x-=8*i;
- 376   2                      i=0;
- 377   2                      y++;
- 378   2              }
- 379   1      }
- 380          
- 381          void draw_picture90(unsigned char x,unsigned char y,unsigned char x_l,unsigned char y_l,unsigned char *pic
-             -ture){
- 382   1              //x_l and y_l must be multiples of 8. They are the picture's length(in x of original system) and width(in
-             - y of original system).
- 383   1              unsigned char i=0;
- 384   1              unsigned char j=0;
- 385   1              int num=0;
- 386   1              x_l=x_l/8;
- 387   1              while(j<y_l){
- 388   2                      j++;
- 389   2                      while(i<x_l){
- 390   3                              i++;
- 391   3                              draw_8bits90(x,y,picture[num]);
- 392   3                              num++;
- 393   3                              y+=8;
- 394   3      
- 395   3                      }
- 396   2                      y-=8*i;
- 397   2                      i=0;
- 398   2                      x--;
- 399   2              }
- 400   1      }
- 401          
- 402          void draw_picture180(unsigned char x,unsigned char y,unsigned char x_l,unsigned char y_l,unsigned char *pi
-             -cture){
- 403   1              //x_l and y_l must be multiples of 8. They are the picture's length(in x of original system) and width(in
-             - y of original system).
- 404   1              unsigned char i=0;
- 405   1              unsigned char j=0;
- 406   1              int num=0;
- 407   1              x_l=x_l/8;
- 408   1              while(j<y_l){
- 409   2                      j++;
- 410   2                      while(i<x_l){
- 411   3                              i++;
- 412   3                              draw_8bits180(x,y,picture[num]);
- 413   3                              num++;
- 414   3                              x-=8;
- 415   3      
- 416   3                      }
- 417   2                      x+=8*i;
- 418   2                      i=0;
- 419   2                      y--;
- 420   2              }
- 421   1      }
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 8   
-
- 422          
- 423          void draw_picture270(unsigned char x,unsigned char y,unsigned char x_l,unsigned char y_l,unsigned char *pi
-             -cture){
- 424   1              //x_l and y_l must be multiples of 8. They are the picture's length(in x of original system) and width(in
-             - y of original system).
- 425   1              unsigned char i=0;
- 426   1              unsigned char j=0;
- 427   1              int num=0;
- 428   1              x_l=x_l/8;
- 429   1              while(j<y_l){
- 430   2                      j++;
- 431   2                      while(i<x_l){
- 432   3                              i++;
- 433   3                              draw_8bits270(x,y,picture[num]);
- 434   3                              num++;
- 435   3                              y-=8;
- 436   3      
- 437   3                      }
- 438   2                      y+=8*i;
- 439   2                      i=0;
- 440   2                      x++;
- 441   2              }
- 442   1      }
- 443          
- 444          void display_string_58(unsigned char x,unsigned char y,unsigned char *string, unsigned int degree){
- 445   1              //degree: 0, 90, 180, 270
- 446   1              unsigned char code ASCII58[] =              // ASCII
- 447   1              {
- 448   1              0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // - -
- 449   1      
- 450   1              0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00, // -!-
- 451   1      
- 452   1              0x50,0x50,0x50,0x00,0x00,0x00,0x00,0x00, // -"-
- 453   1      
- 454   1              0x50,0x50,0xF8,0x50,0xF8,0x50,0x50,0x00, // -#-
- 455   1      
- 456   1              0x20,0x78,0xC0,0x70,0x28,0xF0,0x20,0x00, // -$-
- 457   1      
- 458   1              0xC0,0xC8,0x10,0x20,0x40,0x98,0x18,0x00, // -%-
- 459   1      
- 460   1              0x40,0xA0,0xA0,0x40,0xA8,0x90,0x68,0x00, // -&-
- 461   1      
- 462   1              0x30,0x20,0x40,0x00,0x00,0x00,0x00,0x00, // -'-
- 463   1      
- 464   1              0x10,0x20,0x40,0x40,0x40,0x20,0x10,0x00, // -(-
- 465   1      
- 466   1              0x40,0x20,0x10,0x10,0x10,0x20,0x40,0x00, // -)-
- 467   1      
- 468   1              0x20,0xA8,0x70,0x20,0x70,0xA8,0x20,0x00, // -*-
- 469   1      
- 470   1              0x20,0x20,0x20,0xF8,0x20,0x20,0x20,0x00, // -+-
- 471   1      
- 472   1              0x00,0x00,0x00,0x00,0x60,0x40,0x80,0x00, // -,-
- 473   1      
- 474   1              0x00,0x00,0x00,0xF8,0x00,0x00,0x00,0x00, // ---
- 475   1      
- 476   1              0x00,0x00,0x00,0x00,0x00,0x60,0x60,0x00, // -.-
- 477   1      
- 478   1              0x00,0x08,0x10,0x20,0x40,0x80,0x00,0x00, // -/-
- 479   1      
- 480   1              0x70,0x88,0x98,0xA8,0xC8,0x88,0x70,0x00, // -0-
- 481   1      
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 9   
-
- 482   1              0x20,0x60,0x20,0x20,0x20,0x20,0x70,0x00, // -1-
- 483   1      
- 484   1              0x70,0x88,0x08,0x30,0x40,0x80,0xF8,0x00, // -2-
- 485   1      
- 486   1              0xF8,0x08,0x10,0x30,0x08,0x88,0x70,0x00, // -3-
- 487   1      
- 488   1              0x10,0x30,0x50,0x90,0xF8,0x10,0x10,0x00, // -4-
- 489   1      
- 490   1              0xF8,0x80,0xF0,0x08,0x08,0x88,0x70,0x00, // -5-
- 491   1      
- 492   1              0x38,0x40,0x80,0xF0,0x88,0x88,0x70,0x00, // -6-
- 493   1      
- 494   1              0xF8,0x08,0x10,0x20,0x40,0x40,0x40,0x00, // -7-
- 495   1      
- 496   1              0x70,0x88,0x88,0x70,0x88,0x88,0x70,0x00, // -8-
- 497   1      
- 498   1              0x70,0x88,0x88,0x78,0x08,0x10,0xE0,0x00, // -9-
- 499   1      
- 500   1              0x00,0x60,0x60,0x00,0x60,0x60,0x00,0x00, // -:-
- 501   1      
- 502   1              0x00,0x60,0x60,0x00,0x60,0x60,0x80,0x00, // -;-
- 503   1      
- 504   1              0x10,0x20,0x40,0x80,0x40,0x20,0x10,0x00, // -<-
- 505   1      
- 506   1              0x00,0x00,0xF8,0x00,0xF8,0x00,0x00,0x00, // -=-
- 507   1      
- 508   1              0x40,0x20,0x10,0x08,0x10,0x20,0x40,0x00, // ->-
- 509   1      
- 510   1              0x70,0x88,0x10,0x20,0x20,0x00,0x20,0x00, // -?-
- 511   1      
- 512   1              0x70,0x88,0xB8,0xA8,0xB8,0x80,0x78,0x00, // -@-
- 513   1      
- 514   1              0x20,0x50,0x88,0x88,0xF8,0x88,0x88,0x00, // -A-
- 515   1      
- 516   1              0xF0,0x88,0x88,0xF0,0x88,0x88,0xF0,0x00, // -B-
- 517   1      
- 518   1              0x70,0x88,0x80,0x80,0x80,0x88,0x70,0x00, // -C-
- 519   1      
- 520   1              0xF0,0x88,0x88,0x88,0x88,0x88,0xF0,0x00, // -D-
- 521   1      
- 522   1              0xF8,0x80,0x80,0xF0,0x80,0x80,0xF8,0x00, // -E-
- 523   1      
- 524   1              0xF8,0x80,0x80,0xF0,0x80,0x80,0x80,0x00, // -F-
- 525   1      
- 526   1              0x70,0x88,0x80,0x80,0xB8,0x88,0x78,0x00, // -G-
- 527   1      
- 528   1              0x88,0x88,0x88,0xF8,0x88,0x88,0x88,0x00, // -H-
- 529   1      
- 530   1              0x70,0x20,0x20,0x20,0x20,0x20,0x70,0x00, // -I-
- 531   1      
- 532   1              0x38,0x10,0x10,0x10,0x10,0x90,0x60,0x00, // -J-
- 533   1      
- 534   1              0x88,0x90,0xA0,0xC0,0xA0,0x90,0x88,0x00, // -K-
- 535   1      
- 536   1              0x80,0x80,0x80,0x80,0x80,0x80,0xF8,0x00, // -L-
- 537   1      
- 538   1              0x88,0xD8,0xA8,0xA8,0x88,0x88,0x88,0x00, // -M-
- 539   1      
- 540   1              0x88,0x88,0xC8,0xA8,0x98,0x88,0x88,0x00, // -N-
- 541   1      
- 542   1              0x70,0x88,0x88,0x88,0x88,0x88,0x70,0x00, // -O-
- 543   1      
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 10  
-
- 544   1              0xF0,0x88,0x88,0xF0,0x80,0x80,0x80,0x00, // -P-
- 545   1      
- 546   1              0x70,0x88,0x88,0x88,0xA8,0x90,0x68,0x00, // -Q-
- 547   1      
- 548   1              0xF0,0x88,0x88,0xF0,0xA0,0x90,0x88,0x00, // -R-
- 549   1      
- 550   1              0x70,0x88,0x80,0x70,0x08,0x88,0x70,0x00, // -S-
- 551   1      
- 552   1              0xF8,0x20,0x20,0x20,0x20,0x20,0x20,0x00, // -T-
- 553   1      
- 554   1              0x88,0x88,0x88,0x88,0x88,0x88,0x70,0x00, // -U-
- 555   1      
- 556   1              0x88,0x88,0x88,0x88,0x88,0x50,0x20,0x00, // -V-
- 557   1      
- 558   1              0x88,0x88,0x88,0xA8,0xA8,0xD8,0x88,0x00, // -W-
- 559   1      
- 560   1              0x88,0x88,0x50,0x20,0x50,0x88,0x88,0x00, // -X-
- 561   1      
- 562   1              0x88,0x88,0x50,0x20,0x20,0x20,0x20,0x00, // -Y-
- 563   1      
- 564   1              0xF8,0x08,0x10,0x20,0x40,0x80,0xF8,0x00, // -Z-
- 565   1      
- 566   1              0xF0,0xC0,0xC0,0xC0,0xC0,0xC0,0xF0,0x00, // -[-
- 567   1      
- 568   1              0x00,0x80,0x40,0x20,0x10,0x08,0x00,0x00, // -\-
- 569   1      
- 570   1              0x78,0x18,0x18,0x18,0x18,0x18,0x78,0x00, // -]-
- 571   1      
- 572   1              0x20,0x70,0xA8,0x20,0x20,0x20,0x20,0x00, // -^-
- 573   1      
- 574   1              0x00,0x20,0x40,0xF8,0x40,0x20,0x00,0x00, // -_-
- 575   1      
- 576   1              0x20,0x10,0x08,0x00,0x00,0x00,0x00,0x00, // -`-
- 577   1      
- 578   1              0x00,0x00,0xE0,0x10,0x70,0x90,0x68,0x00, // -a-
- 579   1      
- 580   1              0x80,0x80,0xB0,0xC8,0x88,0xC8,0xB0,0x00, // -b-
- 581   1      
- 582   1              0x00,0x00,0x70,0x88,0x80,0x80,0x70,0x00, // -c-
- 583   1      
- 584   1              0x08,0x08,0x68,0x98,0x88,0x98,0x68,0x00, // -d-
- 585   1      
- 586   1              0x00,0x00,0x70,0x88,0xF0,0x80,0x70,0x00, // -e-
- 587   1      
- 588   1              0x30,0x48,0x40,0xF0,0x40,0x40,0x40,0x00, // -f-
- 589   1      
- 590   1              0x00,0x00,0x70,0x88,0x88,0x78,0x08,0xF0, // -g-
- 591   1      
- 592   1              0x80,0x80,0xB0,0xC8,0x88,0x88,0x88,0x00, // -h-
- 593   1      
- 594   1              0x20,0x00,0x00,0x20,0x20,0x20,0x20,0x00, // -i-
- 595   1      
- 596   1              0x10,0x00,0x00,0x30,0x10,0x10,0x10,0x60, // -j-
- 597   1      
- 598   1              0x80,0x80,0x90,0xA0,0xC0,0xA0,0x98,0x00, // -k-
- 599   1      
- 600   1              0x60,0x20,0x20,0x20,0x20,0x20,0x70,0x00, // -l-
- 601   1      
- 602   1              0x00,0x00,0x50,0xA8,0xA8,0xA8,0xA8,0x00, // -m-
- 603   1      
- 604   1              0x00,0x00,0xB0,0x48,0x48,0x48,0x48,0x00, // -n-
- 605   1      
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 11  
-
- 606   1              0x00,0x00,0x70,0x88,0x88,0x88,0x70,0x00, // -o-
- 607   1      
- 608   1              0x00,0x00,0xF0,0x88,0x88,0xF0,0x80,0x80, // -p-
- 609   1      
- 610   1              0x00,0x00,0x78,0x88,0x88,0x78,0x08,0x08, // -q-
- 611   1      
- 612   1              0x00,0x00,0xB0,0x48,0x40,0x40,0x40,0x00, // -r-
- 613   1      
- 614   1              0x00,0x00,0x78,0x80,0x70,0x08,0xF0,0x00, // -s-
- 615   1      
- 616   1              0x40,0x40,0xF8,0x40,0x40,0x48,0x30,0x00, // -t-
- 617   1      
- 618   1              0x00,0x00,0x90,0x90,0x90,0x90,0x68,0x00, // -u-
- 619   1      
- 620   1              0x00,0x00,0x88,0x88,0x88,0x50,0x20,0x00, // -v-
- 621   1      
- 622   1              0x00,0x00,0xA8,0xA8,0xA8,0xA8,0x50,0x00, // -w-
- 623   1      
- 624   1              0x00,0x00,0x88,0x50,0x20,0x50,0x88,0x00, // -x-
- 625   1      
- 626   1              0x00,0x00,0x88,0x88,0x98,0x68,0x08,0xF0, // -y-
- 627   1      
- 628   1              0x00,0x00,0xF8,0x10,0x20,0x40,0xF8,0x00, // -z-
- 629   1      
- 630   1              0x20,0x40,0x40,0x80,0x40,0x40,0x20,0x00, // -{-
- 631   1      
- 632   1              0x20,0x20,0x20,0x00,0x20,0x20,0x20,0x00, // -|-
- 633   1      
- 634   1              0x20,0x10,0x10,0x08,0x10,0x10,0x20,0x00, // -}-
- 635   1      
- 636   1              0x00,0x00,0x40,0xA8,0x10,0x00,0x00,0x00
- 637   1              };
- 638   1              unsigned int i;
- 639   1              unsigned int maxnum=strlen(string);
- 640   1              unsigned int num;
- 641   1              unsigned char m,n;
- 642   1              unsigned char x_l=1;
- 643   1              unsigned char y_l=8;
- 644   1              unsigned char b=y;
- 645   1              unsigned char a=x;
- 646   1              if(degree==0){
- 647   2                      for(i=0;i<maxnum;i++){
- 648   3                              x=a+6*i;
- 649   3                              y=b;
- 650   3                              num=(string[i]-32)*8;
- 651   3                              //
- 652   3                              m=0;
- 653   3                              n=0;
- 654   3                              while(n<y_l){
- 655   4                                      n++;
- 656   4                                      while(m<x_l){
- 657   5                                              m++;
- 658   5                                              draw_8bits(x,y,ASCII58[num]);
- 659   5                                              num++;
- 660   5                                              x+=8;
- 661   5      
- 662   5                                      }
- 663   4                                      x-=8*m;
- 664   4                                      m=0;
- 665   4                                      y++;
- 666   4                              }
- 667   3                      }
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 12  
-
- 668   2              }
- 669   1              else if(degree==90){
- 670   2                      for(i=0;i<maxnum;i++){
- 671   3                              x=a;
- 672   3                              y=b+6*i;
- 673   3                              num=(string[i]-32)*8;
- 674   3                              //
- 675   3                              m=0;
- 676   3                              n=0;
- 677   3                              while(n<y_l){
- 678   4                                      n++;
- 679   4                                      while(m<x_l){
- 680   5                                              m++;
- 681   5                                              draw_8bits90(x,y,ASCII58[num]);
- 682   5                                              num++;
- 683   5                                              y+=8;
- 684   5      
- 685   5                                      }
- 686   4                                      y-=8*m;
- 687   4                                      m=0;
- 688   4                                      x--;
- 689   4                              }
- 690   3                      }
- 691   2              }else if(degree==180){
- 692   2                      for(i=0;i<maxnum;i++){
- 693   3                              x=a-6*i;
- 694   3                              y=b;
- 695   3                              num=(string[i]-32)*8;
- 696   3                              //
- 697   3                              m=0;
- 698   3                              n=0;
- 699   3                              while(n<y_l){
- 700   4                                      n++;
- 701   4                                      while(m<x_l){
- 702   5                                              m++;
- 703   5                                              draw_8bits180(x,y,ASCII58[num]);
- 704   5                                              num++;
- 705   5                                              x-=8;
- 706   5      
- 707   5                                      }
- 708   4                                      x+=8*m;
- 709   4                                      m=0;
- 710   4                                      y--;
- 711   4                              }
- 712   3                      }
- 713   2              }else if(degree==270){
- 714   2                      for(i=0;i<maxnum;i++){
- 715   3                              x=a;
- 716   3                              y=b-6*i;
- 717   3                              num=(string[i]-32)*8;
- 718   3                              //
- 719   3                              m=0;
- 720   3                              n=0;
- 721   3                              while(n<y_l){
- 722   4                                      n++;
- 723   4                                      while(m<x_l){
- 724   5                                              m++;
- 725   5                                              draw_8bits270(x,y,ASCII58[num]);
- 726   5                                              num++;
- 727   5                                              y-=8;
- 728   5      
- 729   5                                      }
-C51 COMPILER V8.02   LCD12864                                                              10/17/2013 23:53:58 PAGE 13  
-
- 730   4                                      y+=8*m;
- 731   4                                      m=0;
- 732   4                                      x++;
- 733   4                              }
- 734   3                      }
- 735   2              }
- 736   1      }
+ 118   2              lcd_write_command(0xb8|ybyte);
+ 119   2              lcd_write_command(0x40|xbit);
+ 120   2              lcd_write_data(rdata);
+ 121   2              }
+ 122   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   2458    ----
-   CONSTANT SIZE    =    760    ----
+   CODE SIZE        =    268    ----
+   CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =   ----     102
+   DATA SIZE        =   ----       1
    IDATA SIZE       =   ----    ----
-   BIT SIZE         =   ----       8
-   EDATA SIZE       =   ----    ----
-   HDATA SIZE       =   ----    ----
-   XDATA CONST SIZE =   ----    ----
-   FAR CONST SIZE   =   ----    ----
+   BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
 
 

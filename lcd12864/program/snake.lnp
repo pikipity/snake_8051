@@ -4,5 +4,4 @@
 "Sch51.obj",
 "game.obj" 
 TO "snake" 
-
-REMOVEUNUSED 
+RAMSIZE(256) 

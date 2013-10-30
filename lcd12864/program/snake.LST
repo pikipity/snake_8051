@@ -1,9 +1,9 @@
-C51 COMPILER V8.02   SNAKE                                                                 10/17/2013 23:53:58 PAGE 1   
+C51 COMPILER V8.02   SNAKE                                                                 10/30/2013 22:03:21 PAGE 1   
 
 
 C51 COMPILER V8.02, COMPILATION OF MODULE SNAKE
 OBJECT MODULE PLACED IN snake.OBJ
-COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE snake.c OMF2 BROWSE DEBUG
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE snake.c BROWSE DEBUG OBJECTEXTEND
 
 line level    source
 
@@ -13,42 +13,43 @@ line level    source
    4          #include "lcd12864.h"
    5          #include "game.h"
    6          
-   7          void main(void) {
-   8   1        // Set up the scheduler 
-   9   1        SCH_Init_T2();
-  10   1      
-  11   1        //init lcd
-  12   1        lcd_init();
-  13   1        game_init();
-  14   1        
-  15   1        //add task
-  16   1        //SCH_Add_Task(draw, 0, 20);
-  17   1        SCH_Add_Task(move, 0, 500);
-  18   1        SCH_Add_Task(draw,0,20);
-  19   1      
+   7          unsigned int count=0;
+   8          
+   9          void main(void) {
+  10   1        // Set up the scheduler 
+  11   1        SCH_Init_T2();
+  12   1      
+  13   1        //init lcd
+  14   1        lcd_init();
+  15   1        draw();
+  16   1        
+  17   1        //add task
+  18   1        SCH_Add_Task(button,0,20);
+  19   1        //SCH_Add_Task(rungame,0,1000);
   20   1      
-  21   1        //start task
-  22   1        SCH_Start();
-  23   1      
-  24   1        while(1) {
-  25   2                      SCH_Dispatch_Tasks();
-  26   2                      button();
-  27   2        }
-  28   1      }
+  21   1      
+  22   1        //start task
+  23   1        SCH_Start();
+  24   1      
+  25   1        while(1) {       ;
+  26   2                      SCH_Dispatch_Tasks();
+  27   2                      //button();
+  28   2                      if(count++==200){
+  29   3                              rungame();
+  30   3                              count=0;
+  31   3                      }
+  32   2        }
+  33   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     48    ----
+   CODE SIZE        =     55    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =   ----    ----
+   DATA SIZE        =      2    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
-   EDATA SIZE       =   ----    ----
-   HDATA SIZE       =   ----    ----
-   XDATA CONST SIZE =   ----    ----
-   FAR CONST SIZE   =   ----    ----
 END OF MODULE INFORMATION.
 
 
